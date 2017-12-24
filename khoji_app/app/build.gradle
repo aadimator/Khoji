@@ -9,6 +9,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        resConfigs "auto"
     }
     buildTypes {
         release {
@@ -29,6 +30,8 @@ dependencies {
     // Firebase UI authentication
     compile 'com.google.firebase:firebase-auth:11.6.2'
     compile 'com.firebaseui:firebase-ui-auth:3.1.2'
+    implementation 'com.facebook.android:facebook-login:[4,5)'
+    implementation("com.twitter.sdk.android:twitter-core:3.1.1") { transitive = true }
 
 }
 
