@@ -44,6 +44,10 @@ dependencies {
     // Google Location API
     compile 'com.google.android.gms:play-services-location:11.6.2'
 
+    // ButterKnife
+    compile 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+
 }
 
 apply plugin: 'com.google.gms.google-services'
