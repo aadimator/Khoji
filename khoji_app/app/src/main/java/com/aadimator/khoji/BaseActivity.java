@@ -24,6 +24,8 @@ public class BaseActivity extends AppCompatActivity {
         if (auth.getCurrentUser() != null) {
             // already signed in
             Toast.makeText(this, auth.getCurrentUser().getDisplayName(), Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
         } else {
             startActivity(new Intent(this, LoginActivity.class));
         }
