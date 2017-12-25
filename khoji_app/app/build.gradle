@@ -41,6 +41,9 @@ dependencies {
     // Google Maps
     compile 'com.google.android.gms:play-services-maps:11.6.2'
 
+    // Google Location API
+    compile 'com.google.android.gms:play-services-location:11.6.2'
+
 }
 
 apply plugin: 'com.google.gms.google-services'
