@@ -21,7 +21,6 @@ import bolts.Task;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int RC_SIGN_IN = 123;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,28 +30,11 @@ public class MainActivity extends AppCompatActivity {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         if (auth.getCurrentUser() != null) {
             // already signed in
-            Toast.makeText(this, auth.getCurrentUser().getPhoneNumber(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, auth.getCurrentUser().getDisplayName(), Toast.LENGTH_SHORT).show();
         } else {
-            // not signed in
+            startActivity(new Intent(this, LoginActivity.class));
         }
 
-        // Choose authentication providers
-        List<AuthUI.IdpConfig> providers = Arrays.asList(
-                new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
-//                new AuthUI.IdpConfig.Builder(AuthUI.PHONE_VERIFICATION_PROVIDER).build(),
-                new AuthUI.IdpConfig.Builder(AuthUI.FACEBOOK_PROVIDER).build(),
-                new AuthUI.IdpConfig.Builder(AuthUI.TWITTER_PROVIDER).build(),
-                new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build());
-
-        // Create and launch sign-in intent
-        startActivityForResult(
-                AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setAvailableProviders(providers)
-                        .setTheme(R.style.LoginTheme)
-                        .setLogo(R.drawable.logo)
-                        .build(),
-                RC_SIGN_IN);
 
         Button logOut = findViewById(R.id.logout);
         logOut.setOnClickListener(new View.OnClickListener() {
@@ -71,23 +53,4 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == RC_SIGN_IN) {
-            IdpResponse response = IdpResponse.fromResultIntent(data);
-
-            if (resultCode == RESULT_OK) {
-                // Successfully signed in
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                Toast.makeText(this, user.getPhoneNumber(), Toast.LENGTH_SHORT).show();
-                // ...
-            } else {
-                // Sign in failed, check response for error code
-                // ...
-                Toast.makeText(this, "Sign-in failed.", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
 }
