@@ -11,6 +11,7 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         resConfigs "auto"
         vectorDrawables.useSupportLibrary = true
+        resValue "string", "google_maps_key", (project.findProperty("GOOGLE_MAPS_API_KEY") ?: "")
     }
     buildTypes {
         release {
@@ -36,6 +37,9 @@ dependencies {
     compile 'com.firebaseui:firebase-ui-auth:3.1.2'
     implementation 'com.facebook.android:facebook-login:[4,5)'
     implementation("com.twitter.sdk.android:twitter-core:3.1.1") { transitive = true }
+
+    // Google Maps
+    compile 'com.google.android.gms:play-services-maps:11.6.2'
 
 }
 
