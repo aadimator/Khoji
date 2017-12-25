@@ -29,24 +29,9 @@ public class BaseActivity extends AppCompatActivity {
             finish();
         } else {
             startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            // TODO Add on-boarding screens later
         }
-
-
-        Button logOut = findViewById(R.id.logout);
-        logOut.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AuthUI.getInstance()
-                        .signOut(BaseActivity.this)
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
-                                startActivity(new Intent(BaseActivity.this, BaseActivity.class));
-                                finish();
-                            }
-                        });
-            }
-        });
     }
 
 }

@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements
                     mSelectedFragment = ContactsFragment.newInstance("a", "b");
                     break;
                 case R.id.navigation_account:
-                    mSelectedFragment = AccountFragment.newInstance("c", "d");
+                    mSelectedFragment = AccountFragment.newInstance();
                     break;
             }
 
