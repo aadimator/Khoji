@@ -50,7 +50,7 @@ public class LoginActivity extends AppCompatActivity {
                 // Successfully signed in
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 //                Toast.makeText(this, user.getDisplayName(), Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(this, MainActivity.class));
+                startActivity(new Intent(this, BaseActivity.class));
                 finish();
                 // ...
             } else {
