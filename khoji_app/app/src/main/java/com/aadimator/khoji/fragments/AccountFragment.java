@@ -11,11 +11,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.aadimator.khoji.R;
 import com.aadimator.khoji.activities.BaseActivity;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -34,9 +41,16 @@ public class AccountFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private Context mContext;
     private Activity mActivity;
+    private FirebaseUser mUser;
 
     @BindView(R.id.logout)
     Button logoutButton;
+
+    @BindView(R.id.profileImage)
+    ImageView profileImage;
+
+    @BindView(R.id.userName)
+    TextView userName;
 
     public AccountFragment() {
         // Required empty public constructor
@@ -49,6 +63,7 @@ public class AccountFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mUser = FirebaseAuth.getInstance().getCurrentUser();
     }
 
     @Override
@@ -57,6 +72,10 @@ public class AccountFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_account, container, false);
         ButterKnife.bind(this, view);
+
+        String name = (mUser.getDisplayName() != null) ?
+                mUser.getDisplayName() : mUser.getEmail();
+        userName.setText(name);
 
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,6 +91,11 @@ public class AccountFragment extends Fragment {
                 mActivity.finish();
             }
         });
+
+        Glide.with(this).load(mUser.getPhotoUrl())
+                .apply(RequestOptions.circleCropTransform())
+                .into(profileImage);
+
 
         return view;
     }

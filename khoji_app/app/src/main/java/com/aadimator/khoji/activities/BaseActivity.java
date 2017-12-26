@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import com.aadimator.khoji.R;
 import com.aadimator.khoji.models.User;
+import com.aadimator.khoji.utils.Constant;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -41,7 +42,7 @@ public class BaseActivity extends AppCompatActivity {
 
     private void updateDB(FirebaseUser user) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference users = database.getReference("users");
+        DatabaseReference users = database.getReference(Constant.FIREBASE_URL_USERS);
         users.child(user.getUid()).setValue(new User(user));
     }
 

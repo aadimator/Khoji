@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.aadimator.khoji.R;
 import com.aadimator.khoji.models.User;
 import com.aadimator.khoji.models.UserLocation;
+import com.aadimator.khoji.utils.Constant;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
@@ -410,7 +411,7 @@ public class MapFragment extends Fragment implements
 
     private void updateLocationDB(Location location) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference locations = database.getReference("locations");
+        DatabaseReference locations = database.getReference(Constant.FIREBASE_URL_LOCATIONS);
         locations.child(mCurrentUser.getUid()).setValue(new UserLocation(location));
     }
 

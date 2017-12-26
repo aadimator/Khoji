@@ -6,4 +6,8 @@ package com.aadimator.khoji.utils;
 
 public class Constant {
     public static final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 1;
+
+    // Firebase Constants
+    public static final String FIREBASE_URL_USERS = "users";
+    public static final String FIREBASE_URL_LOCATIONS = "locations";
 }
