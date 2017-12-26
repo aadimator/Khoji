@@ -9,9 +9,13 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.aadimator.khoji.R;
+import com.aadimator.khoji.models.User;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class BaseActivity extends AppCompatActivity {
 
@@ -22,9 +26,10 @@ public class BaseActivity extends AppCompatActivity {
         setContentView(R.layout.activity_base);
 
         FirebaseAuth auth = FirebaseAuth.getInstance();
+
         if (auth.getCurrentUser() != null) {
             // already signed in
-            Toast.makeText(this, auth.getCurrentUser().getDisplayName(), Toast.LENGTH_SHORT).show();
+            updateDB(auth.getCurrentUser());
             startActivity(new Intent(this, MainActivity.class));
             finish();
         } else {
@@ -32,6 +37,13 @@ public class BaseActivity extends AppCompatActivity {
             finish();
             // TODO Add on-boarding screens later
         }
+    }
+
+    private void updateDB(FirebaseUser user) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference users = database.getReference("users");
+        User newUser = new User(user);
+        users.child(user.getUid()).setValue(newUser);
     }
 
 }
