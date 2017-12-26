@@ -1,4 +1,4 @@
-package com.aadimator.khoji;
+package com.aadimator.khoji.utils;
 
 /**
  * Created by aadim on 12/25/2017.

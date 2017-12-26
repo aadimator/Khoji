@@ -8,10 +8,8 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Looper;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -23,8 +21,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.aadimator.khoji.BuildConfig;
-import com.aadimator.khoji.Constant;
 import com.aadimator.khoji.R;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
@@ -41,7 +37,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -132,6 +127,12 @@ public class MapFragment extends Fragment implements
      */
     private Marker mCurrentUserMarker;
 
+    /**
+     * If the camera view has been updated to the user's current location.
+     * Should only position once automatically.
+     */
+    private boolean mCameraViewUpdated = false;
+
     // TODO User Active or not
     private boolean mRequestingLocationUpdates = true;
 
@@ -195,7 +196,7 @@ public class MapFragment extends Fragment implements
         if (mRequestingLocationUpdates && checkPermissions()) {
             startLocationUpdates();
         } else if (!checkPermissions()) {
-            requestPermissions();
+            mListener.requestPermission();
         }
     }
 
@@ -267,11 +268,15 @@ public class MapFragment extends Fragment implements
 
                 mCurrentLocation = locationResult.getLastLocation();
                 updateMap();
-                mGoogleMap.animateCamera(CameraUpdateFactory
-                        .newLatLngZoom(
-                                new LatLng(mCurrentLocation.getLatitude(),
-                                        mCurrentLocation.getLongitude()
-                                ), 15.0f));
+
+                if (!mCameraViewUpdated) {
+                    mGoogleMap.animateCamera(CameraUpdateFactory
+                            .newLatLngZoom(
+                                    new LatLng(mCurrentLocation.getLatitude(),
+                                            mCurrentLocation.getLongitude()
+                                    ), 15.0f));
+                    mCameraViewUpdated = true;
+                }
             }
         };
     }
@@ -291,7 +296,7 @@ public class MapFragment extends Fragment implements
      * Requests location updates from the FusedLocationApi. Note: we don't call this unless location
      * runtime permission has been granted.
      */
-    private void startLocationUpdates() {
+    public void startLocationUpdates() {
         // Begin by checking if the device has the necessary location settings.
         mSettingsClient.checkLocationSettings(mLocationSettingsRequest)
                 .addOnSuccessListener(mActivity, new OnSuccessListener<LocationSettingsResponse>() {
@@ -329,7 +334,6 @@ public class MapFragment extends Fragment implements
                                 Toast.makeText(mContext, errorMessage, Toast.LENGTH_LONG).show();
                                 mRequestingLocationUpdates = false;
                         }
-//                        updateUI();
                     }
                 });
     }
@@ -337,7 +341,7 @@ public class MapFragment extends Fragment implements
     /**
      * Removes location updates from the FusedLocationApi.
      */
-    private void stopLocationUpdates() {
+    public void stopLocationUpdates() {
         if (!mRequestingLocationUpdates) {
             Log.d(TAG, "stopLocationUpdates: updates never requested, no-op.");
             return;
@@ -378,73 +382,6 @@ public class MapFragment extends Fragment implements
         int permissionState = ActivityCompat.checkSelfPermission(mActivity,
                 Manifest.permission.ACCESS_FINE_LOCATION);
         return permissionState == PackageManager.PERMISSION_GRANTED;
-    }
-
-    private void requestPermissions() {
-        boolean shouldProvideRationale =
-                ActivityCompat.shouldShowRequestPermissionRationale(mActivity,
-                        Manifest.permission.ACCESS_FINE_LOCATION);
-
-        // Provide an additional rationale to the user. This would happen if the user denied the
-        // request previously, but didn't check the "Don't ask again" checkbox.
-        if (shouldProvideRationale) {
-            Log.i(TAG, "Displaying permission rationale to provide additional context.");
-            showSnackbar(R.string.permission_rationale,
-                    android.R.string.ok, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            // Request permission
-                            ActivityCompat.requestPermissions(mActivity,
-                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                                    Constant.MY_PERMISSIONS_REQUEST_FINE_LOCATION);
-                        }
-                    });
-        } else {
-            Log.i(TAG, "Requesting permission");
-            // Request permission.
-            ActivityCompat.requestPermissions(mActivity,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    Constant.MY_PERMISSIONS_REQUEST_FINE_LOCATION);
-        }
-    }
-
-    /**
-     * Callback received when a permissions request has been completed.
-     */
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        Log.i(TAG, "onRequestPermissionResult");
-        if (requestCode == Constant.MY_PERMISSIONS_REQUEST_FINE_LOCATION) {
-            if (grantResults.length <= 0) {
-                // If user interaction was interrupted, the permission request is cancelled and you
-                // receive empty arrays.
-                Log.i(TAG, "User interaction was cancelled.");
-            } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Log.i(TAG, "Permission granted, updates requested, starting location updates");
-                startLocationUpdates();
-            } else {
-                // Permission denied.
-
-                // Notify the user via a SnackBar that they have rejected a core permission for the
-                // app, which makes the Activity useless.
-                showSnackbar(R.string.permission_denied_explanation,
-                        R.string.settings, new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                // Build intent that displays the App settings screen.
-                                Intent intent = new Intent();
-                                intent.setAction(
-                                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                Uri uri = Uri.fromParts("package",
-                                        BuildConfig.APPLICATION_ID, null);
-                                intent.setData(uri);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(intent);
-                            }
-                        });
-            }
-        }
     }
 
 
@@ -490,6 +427,6 @@ public class MapFragment extends Fragment implements
      * activity.
      */
     public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri);
+        void requestPermission();
     }
 }
