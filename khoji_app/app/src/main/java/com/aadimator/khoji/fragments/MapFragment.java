@@ -22,6 +22,9 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.aadimator.khoji.R;
+import com.aadimator.khoji.models.User;
+import com.aadimator.khoji.models.UserLocation;
+import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -46,6 +49,9 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 
 /**
@@ -82,6 +88,9 @@ public class MapFragment extends Fragment implements
 
     private Activity mActivity;
     private Context mContext;
+
+    private FirebaseUser mCurrentUser;
+
     /**
      * Provides access to the Fused Location Provider API.
      */
@@ -149,6 +158,7 @@ public class MapFragment extends Fragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(mContext);
         mSettingsClient = LocationServices.getSettingsClient(mContext);
 
@@ -268,6 +278,7 @@ public class MapFragment extends Fragment implements
 
                 mCurrentLocation = locationResult.getLastLocation();
                 updateMap();
+                updateLocationDB(mCurrentLocation);
 
                 if (!mCameraViewUpdated) {
                     mGoogleMap.animateCamera(CameraUpdateFactory
@@ -395,6 +406,12 @@ public class MapFragment extends Fragment implements
                 addCurrentUserMarker();
             }
         }
+    }
+
+    private void updateLocationDB(Location location) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference locations = database.getReference("locations");
+        locations.child(mCurrentUser.getUid()).setValue(new UserLocation(location));
     }
 
     private void addCurrentUserMarker() {

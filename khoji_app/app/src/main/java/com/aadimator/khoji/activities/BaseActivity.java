@@ -42,8 +42,7 @@ public class BaseActivity extends AppCompatActivity {
     private void updateDB(FirebaseUser user) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference users = database.getReference("users");
-        User newUser = new User(user);
-        users.child(user.getUid()).setValue(newUser);
+        users.child(user.getUid()).setValue(new User(user));
     }
 
 }

@@ -11,10 +11,10 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class User {
 
-    String mName;
-    String mEmail;
-    String mPhoneNumber;
-    String mPhotoUrl;
+    private String mName;
+    private String mEmail;
+    private String mPhoneNumber;
+    private String mPhotoUrl;
 
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
