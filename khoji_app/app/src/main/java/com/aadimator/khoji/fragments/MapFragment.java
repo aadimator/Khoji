@@ -422,6 +422,7 @@ public class MapFragment extends Fragment implements
                 Log.i(TAG, "User interaction was cancelled.");
             } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Log.i(TAG, "Permission granted, updates requested, starting location updates");
+                startLocationUpdates();
             } else {
                 // Permission denied.
 

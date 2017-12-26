@@ -78,6 +78,19 @@ public class MainActivity extends AppCompatActivity implements
         mSelectedFragment.onActivityResult(requestCode, resultCode, data);
     }
 
+    /**
+     * hack to call the Fragment's onRequestPermissionResult.
+     *
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        mSelectedFragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
     private void changeFragment() {
         getSupportFragmentManager()
                 .beginTransaction()
