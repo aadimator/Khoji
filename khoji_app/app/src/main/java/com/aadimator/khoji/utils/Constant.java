@@ -12,5 +12,5 @@ public class Constant {
     // Firebase Constants
     public static final String FIREBASE_URL_USERS = "users";
     public static final String FIREBASE_URL_LOCATIONS = "locations";
-    public static final String FIREBASE_URL_USERS_TRACKING = FIREBASE_URL_USERS + "/tracking";
+    public static final String FIREBASE_URL_TRACKING = "tracking";
 }

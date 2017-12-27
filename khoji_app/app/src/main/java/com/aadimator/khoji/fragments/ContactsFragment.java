@@ -2,8 +2,6 @@ package com.aadimator.khoji.fragments;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -18,15 +16,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.aadimator.khoji.R;
 import com.aadimator.khoji.models.User;
 import com.aadimator.khoji.utils.Constant;
 import com.aadimator.khoji.utils.GlideApp;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -53,6 +52,7 @@ public class ContactsFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private Context mContext;
     private Activity mActivity;
+    private FirebaseUser mCurrentUser;
 
     private FirebaseRecyclerAdapter mRecyclerAdapter;
 
@@ -82,6 +82,7 @@ public class ContactsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
     }
 
     @Override
@@ -106,13 +107,15 @@ public class ContactsFragment extends Fragment {
     }
 
     private FirebaseRecyclerAdapter createRecyclerAdapater() {
-        Query query = FirebaseDatabase.getInstance()
-                .getReference(Constant.FIREBASE_URL_USERS)
-                .orderByChild("email");
+        Query keyQuery = FirebaseDatabase.getInstance()
+                .getReference(Constant.FIREBASE_URL_TRACKING)
+                .child(mCurrentUser.getUid())
+                .orderByKey();
 
+        DatabaseReference dataRef = FirebaseDatabase.getInstance().getReference(Constant.FIREBASE_URL_USERS);
         FirebaseRecyclerOptions<User> options =
                 new FirebaseRecyclerOptions.Builder<User>()
-                        .setQuery(query, User.class)
+                        .setIndexedQuery(keyQuery, dataRef, User.class)
                         .build();
 
         return new FirebaseRecyclerAdapter<User, UserHolder>(options) {
@@ -143,19 +146,29 @@ public class ContactsFragment extends Fragment {
         };
     }
 
-    private void addContact(String email) {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference users = database.getReference(Constant.FIREBASE_URL_USERS);
+    private void addContact(final String email) {
+        if (email.equals(mCurrentUser.getEmail())) {
+            return;
+        }
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final DatabaseReference users = database.getReference(Constant.FIREBASE_URL_USERS);
         Query query = users.orderByChild("email").equalTo(email);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    for (DataSnapshot user : dataSnapshot.getChildren()) {
-                        Log.i(TAG, user.getValue().toString());
+                    for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                        User user = userSnapshot.getValue(User.class);
+                        database.getReference()
+                                .child(Constant.FIREBASE_URL_TRACKING)
+                                .child(mCurrentUser.getUid())
+                                .child(userSnapshot.getKey())
+                                .setValue(true);
+                        Toast.makeText(mContext, email + " added to Contacts!", Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Log.i(TAG, "No user with that email");
+                    Log.i(TAG, "No user with " + email + " email");
+                    Toast.makeText(mContext, "No user with " + email + " email", Toast.LENGTH_SHORT).show();
                 }
             }
 
