@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.aadimator.khoji.R;
 import com.aadimator.khoji.activities.BaseActivity;
+import com.aadimator.khoji.utils.GlideApp;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.request.RequestOptions;
@@ -92,7 +93,9 @@ public class AccountFragment extends Fragment {
             }
         });
 
-        Glide.with(this).load(mUser.getPhotoUrl())
+        GlideApp.with(this)
+                .load(mUser.getPhotoUrl())
+                .placeholder(R.drawable.com_facebook_profile_picture_blank_square)
                 .apply(RequestOptions.circleCropTransform())
                 .into(profileImage);
 

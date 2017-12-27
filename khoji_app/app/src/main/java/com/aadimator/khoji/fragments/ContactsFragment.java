@@ -1,14 +1,41 @@
 package com.aadimator.khoji.fragments;
 
+import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.aadimator.khoji.R;
+import com.aadimator.khoji.models.User;
+import com.aadimator.khoji.utils.Constant;
+import com.aadimator.khoji.utils.GlideApp;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 
 /**
@@ -20,16 +47,23 @@ import com.aadimator.khoji.R;
  * create an instance of this fragment.
  */
 public class ContactsFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private final String TAG = ContactsFragment.class.getSimpleName();
 
     private OnFragmentInteractionListener mListener;
+    private Context mContext;
+    private Activity mActivity;
+
+    private FirebaseRecyclerAdapter mRecyclerAdapter;
+
+    @BindView(R.id.edit_text_email)
+    EditText editTextEmail;
+
+    @BindView(R.id.button_add_contact)
+    Button buttonAddContact;
+
+    @BindView(R.id.recycler_view_contacts)
+    RecyclerView mRecyclerViewContacts;
 
     public ContactsFragment() {
         // Required empty public constructor
@@ -39,46 +73,118 @@ public class ContactsFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
      * @return A new instance of fragment ContactsFragment.
      */
-    // TODO: Rename and change types and number of parameters
-    public static ContactsFragment newInstance(String param1, String param2) {
-        ContactsFragment fragment = new ContactsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    public static ContactsFragment newInstance() {
+        return new ContactsFragment();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_contacts, container, false);
+        View view = inflater.inflate(R.layout.fragment_contacts, container, false);
+        ButterKnife.bind(this, view);
+
+        buttonAddContact.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String email = editTextEmail.getText().toString();
+                addContact(email);
+            }
+        });
+
+        mRecyclerAdapter = createRecyclerAdapater();
+        mRecyclerViewContacts.setLayoutManager(new LinearLayoutManager(mContext));
+        mRecyclerViewContacts.setAdapter(mRecyclerAdapter);
+        return view;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
+    private FirebaseRecyclerAdapter createRecyclerAdapater() {
+        Query query = FirebaseDatabase.getInstance()
+                .getReference(Constant.FIREBASE_URL_USERS)
+                .orderByChild("email");
+
+        FirebaseRecyclerOptions<User> options =
+                new FirebaseRecyclerOptions.Builder<User>()
+                        .setQuery(query, User.class)
+                        .build();
+
+        return new FirebaseRecyclerAdapter<User, UserHolder>(options) {
+            @Override
+            public UserHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.contacts_list, parent, false);
+
+                return new UserHolder(view);
+            }
+
+            @Override
+            protected void onBindViewHolder(@NonNull UserHolder holder, int position, @NonNull User model) {
+                Log.i(TAG, model.toString());
+                holder.mTextViewName.setText(model.name);
+                GlideApp.with(mActivity)
+                        .load(model.photoUrl)
+                        .placeholder(R.drawable.com_facebook_profile_picture_blank_square)
+                        .circleCrop()
+                        .into(holder.mImageViewProfile);
+            }
+
+            @Override
+            public void onError(@NonNull DatabaseError error) {
+                super.onError(error);
+                Log.i(TAG, "Error getting data");
+            }
+        };
+    }
+
+    private void addContact(String email) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference users = database.getReference(Constant.FIREBASE_URL_USERS);
+        Query query = users.orderByChild("email").equalTo(email);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot user : dataSnapshot.getChildren()) {
+                        Log.i(TAG, user.getValue().toString());
+                    }
+                } else {
+                    Log.i(TAG, "No user with that email");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mRecyclerAdapter.startListening();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mRecyclerAdapter.stopListening();
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        mContext = context;
+        if (context instanceof Activity) {
+            mActivity = (Activity) context;
+        }
         if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
         } else {
@@ -91,20 +197,31 @@ public class ContactsFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        mContext = null;
+        mActivity = null;
     }
+
 
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
      * to the activity and potentially other fragments contained in that
      * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    class UserHolder extends RecyclerView.ViewHolder {
+
+        @BindView(R.id.imageViewProfile)
+        ImageView mImageViewProfile;
+        @BindView(R.id.textViewName)
+        TextView mTextViewName;
+
+        UserHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
     }
 }

@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements
                     mSelectedFragment = MapFragment.newInstance();
                     break;
                 case R.id.navigation_contacts:
-                    mSelectedFragment = ContactsFragment.newInstance("a", "b");
+                    mSelectedFragment = ContactsFragment.newInstance();
                     break;
                 case R.id.navigation_account:
                     mSelectedFragment = AccountFragment.newInstance();
