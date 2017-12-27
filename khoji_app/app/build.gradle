@@ -1,6 +1,19 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            try {
+                storeFile file('keystore.jks')
+                storePassword KEYSTORE_PASSWORD
+                keyAlias "khoji"
+                keyPassword KEY_PASSWORD
+            }
+            catch (ex) {
+                throw new InvalidUserDataException("You should define KEYSTORE_PASSWORD and KEY_PASSWORD in gradle.properties.")
+            }
+        }
+    }
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.aadimator.khoji"
@@ -17,12 +30,17 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
+        }
+        debug {
+            signingConfig signingConfigs.config
+            applicationIdSuffix '.debug'
         }
     }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:27.0.2'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation 'com.android.support:design:27.0.2'
@@ -31,30 +49,24 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-
     // Firebase UI authentication
     compile 'com.google.firebase:firebase-auth:11.6.2'
     compile 'com.firebaseui:firebase-ui-auth:3.1.2'
     implementation 'com.facebook.android:facebook-login:[4,5)'
-    implementation("com.twitter.sdk.android:twitter-core:3.1.1") { transitive = true }
-
+    implementation('com.twitter.sdk.android:twitter-core:3.1.1') { transitive = true }
     // Firebase Realtime Database
     implementation 'com.google.firebase:firebase-database:11.6.2'
-
+    implementation 'com.firebaseui:firebase-ui-database:3.1.2'
     // Google Maps
     compile 'com.google.android.gms:play-services-maps:11.6.2'
-
     // Google Location API
     compile 'com.google.android.gms:play-services-location:11.6.2'
-
     // ButterKnife
     compile 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
-
     // Glide
     implementation 'com.github.bumptech.glide:glide:4.4.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.4.0'
-
 }
 
 apply plugin: 'com.google.gms.google-services'
