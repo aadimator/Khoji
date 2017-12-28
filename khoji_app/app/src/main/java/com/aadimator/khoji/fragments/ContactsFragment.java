@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -110,7 +111,7 @@ public class ContactsFragment extends Fragment {
         Query keyQuery = FirebaseDatabase.getInstance()
                 .getReference(Constant.FIREBASE_URL_CONTACTS)
                 .child(mCurrentUser.getUid())
-                .orderByKey();
+                .orderByValue();
 
         DatabaseReference dataRef = FirebaseDatabase.getInstance().getReference(Constant.FIREBASE_URL_USERS);
         FirebaseRecyclerOptions<User> options =
@@ -128,13 +129,24 @@ public class ContactsFragment extends Fragment {
             }
 
             @Override
-            protected void onBindViewHolder(@NonNull UserHolder holder, int position, @NonNull User model) {
+            protected void onBindViewHolder(@NonNull UserHolder holder, final int position, @NonNull final User model) {
                 holder.mTextViewName.setText(model.name);
                 GlideApp.with(mActivity)
                         .load(model.photoUrl)
                         .placeholder(R.drawable.com_facebook_profile_picture_blank_square)
                         .circleCrop()
                         .into(holder.mImageViewProfile);
+                holder.mButtonDelete.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        String key = mRecyclerAdapter.getRef(position).getKey();
+                        FirebaseDatabase.getInstance()
+                                .getReference(Constant.FIREBASE_URL_CONTACTS)
+                                .child(mCurrentUser.getUid())
+                                .child(key)
+                                .removeValue();
+                    }
+                });
             }
 
             @Override
@@ -162,7 +174,7 @@ public class ContactsFragment extends Fragment {
                                 .child(Constant.FIREBASE_URL_CONTACTS)
                                 .child(mCurrentUser.getUid())
                                 .child(userSnapshot.getKey())
-                                .setValue(true);
+                                .setValue(user.name);
                         Toast.makeText(mContext, email + " added to Contacts!", Toast.LENGTH_SHORT).show();
                     }
                 } else {
@@ -230,6 +242,8 @@ public class ContactsFragment extends Fragment {
         ImageView mImageViewProfile;
         @BindView(R.id.textViewName)
         TextView mTextViewName;
+        @BindView(R.id.buttonDelete)
+        ImageButton mButtonDelete;
 
         UserHolder(View itemView) {
             super(itemView);

@@ -296,7 +296,6 @@ public class MapFragment extends Fragment implements
                 Marker marker = mGoogleMap.addMarker(new MarkerOptions()
                         .position(latLng)
                         .title(user.name));
-                marker.showInfoWindow();
                 mContactsMarkers.put(entry.getKey(), marker);
             }
         }

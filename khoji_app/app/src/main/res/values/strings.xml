@@ -16,5 +16,6 @@
     <string name="profile_picture_content_description">User\'s Profile picture</string>
     <string name="enter_email">Enter Email</string>
     <string name="add_contact_btn_txt">Add</string>
+    <string name="delete_btn_content_desc">Delete</string>
 
 </resources>
