@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -25,7 +24,6 @@ import com.aadimator.khoji.R;
 import com.aadimator.khoji.models.User;
 import com.aadimator.khoji.models.UserLocation;
 import com.aadimator.khoji.utils.Constant;
-import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -73,6 +71,8 @@ public class MapFragment extends Fragment implements
         OnMapReadyCallback {
 
     private final String TAG = MapFragment.class.getSimpleName();
+    private Activity mActivity;
+    private Context mContext;
 
     /**
      * Constant used in the location settings dialog.
@@ -91,10 +91,10 @@ public class MapFragment extends Fragment implements
     private static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
             UPDATE_INTERVAL_IN_MILLISECONDS / 2;
 
+    /**
+     * The listener implemented by the Activity for communication with fragment.
+     */
     private OnFragmentInteractionListener mListener;
-
-    private Activity mActivity;
-    private Context mContext;
 
     /**
      * Reference to the currently logged in user.
@@ -125,6 +125,7 @@ public class MapFragment extends Fragment implements
      * Stores parameters for requests to the FusedLocationProviderApi.
      */
     private LocationRequest mLocationRequest;
+
     /**
      * Stores the types of location services the client is interested in using. Used for checking
      * settings to determine if the device has optimal location settings.
@@ -156,6 +157,9 @@ public class MapFragment extends Fragment implements
      */
     private Marker mCurrentUserMarker;
 
+    /**
+     * Stores the markers of all the contacts
+     */
     private HashMap<String, Marker> mContactsMarkers;
 
     /**
@@ -164,7 +168,9 @@ public class MapFragment extends Fragment implements
      */
     private boolean mCameraViewUpdated = false;
 
-    // TODO User Active or not
+    /**
+     * If the user is requesting the location updates or not.
+     */
     private boolean mRequestingLocationUpdates = true;
 
     public MapFragment() {
@@ -174,6 +180,21 @@ public class MapFragment extends Fragment implements
 
     public static MapFragment newInstance() {
         return new MapFragment();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mContext = context;
+        if (context instanceof Activity) {
+            mActivity = (Activity) context;
+        }
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
     }
 
     @Override
@@ -212,21 +233,6 @@ public class MapFragment extends Fragment implements
         // Register for the Map callback
         SupportMapFragment supportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         supportMapFragment.getMapAsync(this);
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        mContext = context;
-        if (context instanceof Activity) {
-            mActivity = (Activity) context;
-        }
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
     }
 
     @Override
@@ -409,7 +415,9 @@ public class MapFragment extends Fragment implements
         return permissionState == PackageManager.PERMISSION_GRANTED;
     }
 
-
+    /**
+     * Update the map to show user's and contacts markers
+     */
     private void updateMap() {
         if (mMapReady && mGoogleMap != null) {
             if (mCurrentLocation != null) {
@@ -419,6 +427,33 @@ public class MapFragment extends Fragment implements
         }
     }
 
+    /**
+     * Add the current User's marker. We don't want this and contacts markers
+     * to be the same (diff icons etc).
+     * That's why writing this in a separate function.
+     */
+    private void addCurrentUserMarker() {
+        LatLng latLng = new LatLng(
+                mCurrentLocation.getLatitude(),
+                mCurrentLocation.getLongitude()
+        );
+        if (mCurrentUserMarker == null) {
+            mCurrentUserMarker = mGoogleMap
+                    .addMarker(new MarkerOptions()
+                            .position(latLng)
+                            .title(mCurrentUser.getDisplayName())
+                            .icon(BitmapDescriptorFactory
+                                    .defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                    );
+            mCurrentUserMarker.showInfoWindow();
+        } else {
+            mCurrentUserMarker.setPosition(latLng);
+        }
+    }
+
+    /**
+     * Add the Contact markers on the map.
+     */
     private void addContactsMarkers() {
         for (Map.Entry<String, UserLocation> entry : mContactsLocations.entrySet()) {
             UserLocation location = entry.getValue();
@@ -437,32 +472,13 @@ public class MapFragment extends Fragment implements
         }
     }
 
+    /**
+     * Update Firebase DB with the logged in user's current location
+     */
     private void updateLocationDB(Location location) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference locations = database.getReference(Constant.FIREBASE_URL_LOCATIONS);
         locations.child(mCurrentUser.getUid()).setValue(new UserLocation(location));
-    }
-
-    private void addCurrentUserMarker() {
-        LatLng latLng = new LatLng(
-                mCurrentLocation.getLatitude(),
-                mCurrentLocation.getLongitude()
-        );
-        if (mCurrentUserMarker == null) {
-            mCurrentUserMarker = mGoogleMap
-                    .addMarker(new MarkerOptions()
-                            .position(latLng)
-                            .title(FirebaseAuth
-                                    .getInstance()
-                                    .getCurrentUser()
-                                    .getDisplayName())
-                            .icon(BitmapDescriptorFactory
-                                    .defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-                    );
-            mCurrentUserMarker.showInfoWindow();
-        } else {
-            mCurrentUserMarker.setPosition(latLng);
-        }
     }
 
     /**
@@ -493,29 +509,9 @@ public class MapFragment extends Fragment implements
                 );
     }
 
-    private void getLocations(DataSnapshot dataSnapshot) {
-        for (DataSnapshot child : dataSnapshot.getChildren()) {
-            FirebaseDatabase.getInstance()
-                    .getReference(Constant.FIREBASE_URL_LOCATIONS)
-                    .child(child.getKey())
-                    .orderByKey()
-                    .addValueEventListener(
-                            new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    UserLocation location = dataSnapshot.getValue(UserLocation.class);
-                                    mContactsLocations.put(dataSnapshot.getKey(), location);
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-
-                                }
-                            }
-                    );
-        }
-    }
-
+    /**
+     * Retrieve the User given a dataSnapshot of the UIDs and store them in the mContacts
+     */
     private void getUsers(DataSnapshot dataSnapshot) {
         for (DataSnapshot child : dataSnapshot.getChildren()) {
             FirebaseDatabase.getInstance()
@@ -528,6 +524,33 @@ public class MapFragment extends Fragment implements
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     User user = dataSnapshot.getValue(User.class);
                                     mContacts.put(dataSnapshot.getKey(), user);
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            }
+                    );
+        }
+    }
+
+    /**
+     * Retrieve the Locations of the users given a dataSnapshot of the UIDs and
+     * store them in the mContactsLocations
+     */
+    private void getLocations(DataSnapshot dataSnapshot) {
+        for (DataSnapshot child : dataSnapshot.getChildren()) {
+            FirebaseDatabase.getInstance()
+                    .getReference(Constant.FIREBASE_URL_LOCATIONS)
+                    .child(child.getKey())
+                    .orderByKey()
+                    .addValueEventListener(
+                            new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    UserLocation location = dataSnapshot.getValue(UserLocation.class);
+                                    mContactsLocations.put(dataSnapshot.getKey(), location);
                                 }
 
                                 @Override
