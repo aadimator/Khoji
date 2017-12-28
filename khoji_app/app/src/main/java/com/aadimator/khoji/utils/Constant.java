@@ -7,7 +7,15 @@ import com.bumptech.glide.Glide;
  */
 
 public class Constant {
+    /**
+     * Constant used in the location permission.
+     */
     public static final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 1;
+
+    /**
+     * Constant used in the location settings dialog.
+     */
+    public static final int REQUEST_CHECK_LOCATION_SETTINGS = 0x1;
 
     // Firebase Constants
     public static final String FIREBASE_URL_USERS = "users";

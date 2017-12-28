@@ -1,6 +1,7 @@
 package com.aadimator.khoji.activities;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -67,11 +68,8 @@ public class MainActivity extends AppCompatActivity implements
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
 
-
     /**
-     * startResolutionForResult in the MapFragment isn't calling Fragment's
-     * onActivityResult but MainActivity's, so this is a hack to call
-     * Fragment's onActivityResult.
+     * Location settings result, called from LocationHelper
      *
      * @param requestCode
      * @param resultCode
@@ -80,9 +78,21 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        mSelectedFragment.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            // Check for the integer request code originally supplied to startResolutionForResult().
+            case Constant.REQUEST_CHECK_LOCATION_SETTINGS:
+                switch (resultCode) {
+                    case RESULT_OK:
+                        Log.i(TAG, "User agreed to make required location settings changes.");
+                        ((MapFragment) mSelectedFragment).startLocationUpdates();
+                        break;
+                    case RESULT_CANCELED:
+                        Log.i(TAG, "User chose not to make required location settings changes.");
+                        break;
+                }
+                break;
+        }
     }
-
 
     /**
      * Callback received when a permissions request has been completed.
@@ -145,7 +155,6 @@ public class MainActivity extends AppCompatActivity implements
                 Snackbar.LENGTH_INDEFINITE)
                 .setAction(getString(actionStringId), listener).show();
     }
-
 
     @Override
     public void requestPermission() {
