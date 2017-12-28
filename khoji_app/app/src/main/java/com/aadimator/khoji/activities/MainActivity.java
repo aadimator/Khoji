@@ -1,7 +1,6 @@
 package com.aadimator.khoji.activities;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -18,11 +17,11 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.aadimator.khoji.BuildConfig;
-import com.aadimator.khoji.utils.Constant;
 import com.aadimator.khoji.R;
 import com.aadimator.khoji.fragments.AccountFragment;
 import com.aadimator.khoji.fragments.ContactsFragment;
 import com.aadimator.khoji.fragments.MapFragment;
+import com.aadimator.khoji.utils.Constant;
 
 public class MainActivity extends AppCompatActivity implements
         MapFragment.OnFragmentInteractionListener,
@@ -30,6 +29,8 @@ public class MainActivity extends AppCompatActivity implements
         AccountFragment.OnFragmentInteractionListener {
 
     private final String TAG = MainActivity.class.getSimpleName();
+    private final String FRAGMENT_SAVE_KEY = "saveFragment";
+
     private Fragment mSelectedFragment = null;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -61,19 +62,21 @@ public class MainActivity extends AppCompatActivity implements
 
         setTitle(getString(R.string.app_name));
 
-        mSelectedFragment = MapFragment.newInstance();
+        if (savedInstanceState != null) {
+            mSelectedFragment = getSupportFragmentManager().getFragment(savedInstanceState,
+                    FRAGMENT_SAVE_KEY);
+        } else {
+            mSelectedFragment = MapFragment.newInstance();
+        }
+
         changeFragment();
 
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
 
     /**
      * Location settings result, called from LocationHelper
-     *
-     * @param requestCode
-     * @param resultCode
-     * @param data
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -154,6 +157,15 @@ public class MainActivity extends AppCompatActivity implements
                 getString(mainTextStringId),
                 Snackbar.LENGTH_INDEFINITE)
                 .setAction(getString(actionStringId), listener).show();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        getSupportFragmentManager().putFragment(
+                outState,
+                FRAGMENT_SAVE_KEY,
+                mSelectedFragment);
     }
 
     @Override
