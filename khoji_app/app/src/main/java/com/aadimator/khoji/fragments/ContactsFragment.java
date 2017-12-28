@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 
 import com.aadimator.khoji.R;
 import com.aadimator.khoji.models.User;
+import com.aadimator.khoji.models.UserLocation;
 import com.aadimator.khoji.utils.Constant;
 import com.aadimator.khoji.utils.GlideApp;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -147,6 +149,13 @@ public class ContactsFragment extends Fragment {
                                 .removeValue();
                     }
                 });
+
+                holder.mContactView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        mListener.onContactSelection(mRecyclerAdapter.getRef(position).getKey());
+                    }
+                });
             }
 
             @Override
@@ -233,7 +242,7 @@ public class ContactsFragment extends Fragment {
      * activity.
      */
     public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri);
+        void onContactSelection(String uid);
     }
 
     class UserHolder extends RecyclerView.ViewHolder {
@@ -244,6 +253,8 @@ public class ContactsFragment extends Fragment {
         TextView mTextViewName;
         @BindView(R.id.buttonDelete)
         ImageButton mButtonDelete;
+        @BindView(R.id.contactView)
+        ConstraintLayout mContactView;
 
         UserHolder(View itemView) {
             super(itemView);

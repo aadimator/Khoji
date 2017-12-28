@@ -56,6 +56,8 @@ public class MapFragment extends Fragment implements
     private Activity mActivity;
     private Context mContext;
 
+    private static final String ARG_UID = "uid";
+
 
     /**
      * The listener implemented by the Activity for communication with fragment.
@@ -120,13 +122,27 @@ public class MapFragment extends Fragment implements
      */
     private boolean mRequestingLocationUpdates = true;
 
+    private String mCameraFocusUid;
+    private float mZoomLevel = 15.0f;
+
     public MapFragment() {
         // Required empty public constructor
     }
 
 
-    public static MapFragment newInstance() {
-        return new MapFragment();
+    /**
+     * Create a Map fragment where camera will be focused on the
+     * user's location provided in the args.
+     *
+     * @param cameraFocusUid User ID where the Camera will be focused.
+     * @return A new instance of fragment MapFragment.
+     */
+    public static MapFragment newInstance(String cameraFocusUid) {
+        MapFragment mapFragment = new MapFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_UID, cameraFocusUid);
+        mapFragment.setArguments(args);
+        return mapFragment;
     }
 
     @Override
@@ -147,6 +163,10 @@ public class MapFragment extends Fragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (getArguments() != null) {
+            mCameraFocusUid = getArguments().getString(ARG_UID);
+        }
 
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
         mContacts = new HashMap<>();
@@ -224,16 +244,29 @@ public class MapFragment extends Fragment implements
                 updateMap();
                 updateLocationDB(mCurrentLocation);
 
-                if (!mCameraViewUpdated) {
-                    mGoogleMap.animateCamera(CameraUpdateFactory
-                            .newLatLngZoom(
-                                    new LatLng(mCurrentLocation.getLatitude(),
-                                            mCurrentLocation.getLongitude()
-                                    ), 15.0f));
-                    mCameraViewUpdated = true;
-                }
+                updateCameraView(mZoomLevel);
             }
         };
+    }
+
+    private void updateCameraView(float zoomLevel) {
+        if (!mCameraViewUpdated) {
+            LatLng latLng;
+            if (mCameraFocusUid.equals(mCurrentUser.getUid())) {
+                latLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+            } else {
+                if (!mContactsLocations.isEmpty() &&
+                        mContactsLocations.containsKey(mCameraFocusUid)) {
+                    UserLocation location = mContactsLocations.get(mCameraFocusUid);
+                    latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                } else {
+                    return;
+                }
+            }
+            mGoogleMap.animateCamera(CameraUpdateFactory
+                    .newLatLngZoom(latLng, zoomLevel));
+            mCameraViewUpdated = true;
+        }
     }
 
     /**

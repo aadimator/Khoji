@@ -22,6 +22,7 @@ import com.aadimator.khoji.fragments.AccountFragment;
 import com.aadimator.khoji.fragments.ContactsFragment;
 import com.aadimator.khoji.fragments.MapFragment;
 import com.aadimator.khoji.utils.Constant;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity implements
         MapFragment.OnFragmentInteractionListener,
@@ -40,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_map:
-                    mSelectedFragment = MapFragment.newInstance();
+                    mSelectedFragment = MapFragment.newInstance(FirebaseAuth.getInstance().getUid());
                     break;
                 case R.id.navigation_contacts:
                     mSelectedFragment = ContactsFragment.newInstance();
@@ -66,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements
             mSelectedFragment = getSupportFragmentManager().getFragment(savedInstanceState,
                     FRAGMENT_SAVE_KEY);
         } else {
-            mSelectedFragment = MapFragment.newInstance();
+            mSelectedFragment = MapFragment.newInstance(FirebaseAuth.getInstance().getUid());
         }
 
         changeFragment();
@@ -200,5 +201,11 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onFragmentInteraction(Uri uri) {
 
+    }
+
+    @Override
+    public void onContactSelection(String uid) {
+        mSelectedFragment = MapFragment.newInstance(uid);
+        changeFragment();
     }
 }
