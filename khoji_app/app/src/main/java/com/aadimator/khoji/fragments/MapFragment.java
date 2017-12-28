@@ -51,8 +51,14 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -90,7 +96,20 @@ public class MapFragment extends Fragment implements
     private Activity mActivity;
     private Context mContext;
 
+    /**
+     * Reference to the currently logged in user.
+     */
     private FirebaseUser mCurrentUser;
+
+    /**
+     * Stores the Users in the mCurrentUser's contacts.
+     */
+    private HashMap<String, User> mContacts;
+
+    /**
+     * Stores the Location of the mCurrentUser's contacts.
+     */
+    private HashMap<String, UserLocation> mContactsLocations;
 
     /**
      * Provides access to the Fused Location Provider API.
@@ -137,6 +156,8 @@ public class MapFragment extends Fragment implements
      */
     private Marker mCurrentUserMarker;
 
+    private HashMap<String, Marker> mContactsMarkers;
+
     /**
      * If the camera view has been updated to the user's current location.
      * Should only position once automatically.
@@ -160,6 +181,10 @@ public class MapFragment extends Fragment implements
         super.onCreate(savedInstanceState);
 
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
+        mContacts = new HashMap<>();
+        mContactsLocations = new HashMap<>();
+        mContactsMarkers = new HashMap<>();
+
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(mContext);
         mSettingsClient = LocationServices.getSettingsClient(mContext);
 
@@ -168,6 +193,9 @@ public class MapFragment extends Fragment implements
         createLocationCallback();
         createLocationRequest();
         buildLocationSettingsRequest();
+
+        // Get the location and info of the User's contacts
+        getContactsInfo();
     }
 
     @Override
@@ -221,6 +249,7 @@ public class MapFragment extends Fragment implements
         super.onDetach();
         mListener = null;
         mContext = null;
+        mActivity = null;
     }
 
     @Override
@@ -372,22 +401,6 @@ public class MapFragment extends Fragment implements
     }
 
     /**
-     * Shows a {@link Snackbar}.
-     *
-     * @param mainTextStringId The id for the string resource for the Snackbar text.
-     * @param actionStringId   The text of the action item.
-     * @param listener         The listener associated with the Snackbar action.
-     */
-    private void showSnackbar(final int mainTextStringId, final int actionStringId,
-                              View.OnClickListener listener) {
-        Snackbar.make(
-                mActivity.findViewById(android.R.id.content),
-                getString(mainTextStringId),
-                Snackbar.LENGTH_INDEFINITE)
-                .setAction(getString(actionStringId), listener).show();
-    }
-
-    /**
      * Return the current state of the permissions needed.
      */
     private boolean checkPermissions() {
@@ -400,11 +413,26 @@ public class MapFragment extends Fragment implements
     private void updateMap() {
         if (mMapReady && mGoogleMap != null) {
             if (mCurrentLocation != null) {
-                LatLng latLng = new LatLng(
-                        mCurrentLocation.getLatitude(),
-                        mCurrentLocation.getLongitude()
-                );
                 addCurrentUserMarker();
+                addContactsMarkers();
+            }
+        }
+    }
+
+    private void addContactsMarkers() {
+        for (Map.Entry<String, UserLocation> entry : mContactsLocations.entrySet()) {
+            UserLocation location = entry.getValue();
+            User user = mContacts.get(entry.getKey());
+            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+            if (mContactsMarkers.containsKey(entry.getKey())) {
+                Marker marker = mContactsMarkers.get(entry.getKey());
+                marker.setPosition(latLng);
+            } else {
+                Marker marker = mGoogleMap.addMarker(new MarkerOptions()
+                        .position(latLng)
+                        .title(user.name));
+                marker.showInfoWindow();
+                mContactsMarkers.put(entry.getKey(), marker);
             }
         }
     }
@@ -434,6 +462,80 @@ public class MapFragment extends Fragment implements
             mCurrentUserMarker.showInfoWindow();
         } else {
             mCurrentUserMarker.setPosition(latLng);
+        }
+    }
+
+    /**
+     * Get the Contacts Info from the Firebase DB
+     */
+    private void getContactsInfo() {
+        final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        firebaseDatabase.getReference(Constant.FIREBASE_URL_CONTACTS)
+                .child(mCurrentUser.getUid())
+                .orderByKey()
+                .addValueEventListener(
+                        new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                // Get the Contacts from the dataSnapshot
+                                getUsers(dataSnapshot);
+
+                                // Get the locations from the dataSnapshot
+                                getLocations(dataSnapshot);
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        }
+                );
+    }
+
+    private void getLocations(DataSnapshot dataSnapshot) {
+        for (DataSnapshot child : dataSnapshot.getChildren()) {
+            FirebaseDatabase.getInstance()
+                    .getReference(Constant.FIREBASE_URL_LOCATIONS)
+                    .child(child.getKey())
+                    .orderByKey()
+                    .addValueEventListener(
+                            new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    UserLocation location = dataSnapshot.getValue(UserLocation.class);
+                                    mContactsLocations.put(dataSnapshot.getKey(), location);
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            }
+                    );
+        }
+    }
+
+    private void getUsers(DataSnapshot dataSnapshot) {
+        for (DataSnapshot child : dataSnapshot.getChildren()) {
+            FirebaseDatabase.getInstance()
+                    .getReference(Constant.FIREBASE_URL_USERS)
+                    .child(child.getKey())
+                    .orderByKey()
+                    .addValueEventListener(
+                            new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    User user = dataSnapshot.getValue(User.class);
+                                    mContacts.put(dataSnapshot.getKey(), user);
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            }
+                    );
         }
     }
 

@@ -137,8 +137,8 @@ public class MainActivity extends AppCompatActivity implements
      * @param actionStringId   The text of the action item.
      * @param listener         The listener associated with the Snackbar action.
      */
-    private void showSnackbar(final int mainTextStringId, final int actionStringId,
-                              View.OnClickListener listener) {
+    public void showSnackbar(final int mainTextStringId, final int actionStringId,
+                             View.OnClickListener listener) {
         Snackbar.make(
                 findViewById(android.R.id.content),
                 getString(mainTextStringId),

@@ -14,7 +14,7 @@ public class UserLocation {
     private long mTime;
     private float mSpeed;
     private double mAltitude;
-    private double mLogitude;
+    private double mLongitude;
     private double mLatitude;
 
     public UserLocation() {
@@ -23,10 +23,18 @@ public class UserLocation {
 
     public UserLocation(Location location) {
         mLatitude = location.getLatitude();
-        mLogitude = location.getLongitude();
+        mLongitude = location.getLongitude();
         mAltitude = location.getAltitude();
         mSpeed = location.getSpeed();
         mTime = location.getTime();
+    }
+
+    public UserLocation(long time, float speed, double altitude, double longitude, double latitude) {
+        mTime = time;
+        mSpeed = speed;
+        mAltitude = altitude;
+        mLongitude = longitude;
+        mLatitude = latitude;
     }
 
     public long getTime() {
@@ -41,11 +49,31 @@ public class UserLocation {
         return mAltitude;
     }
 
-    public double getLogitude() {
-        return mLogitude;
+    public double getLongitude() {
+        return mLongitude;
     }
 
     public double getLatitude() {
         return mLatitude;
+    }
+
+    public void setTime(long time) {
+        mTime = time;
+    }
+
+    public void setSpeed(float speed) {
+        mSpeed = speed;
+    }
+
+    public void setAltitude(double altitude) {
+        mAltitude = altitude;
+    }
+
+    public void setLongitude(double longitude) {
+        mLongitude = longitude;
+    }
+
+    public void setLatitude(double latitude) {
+        mLatitude = latitude;
     }
 }

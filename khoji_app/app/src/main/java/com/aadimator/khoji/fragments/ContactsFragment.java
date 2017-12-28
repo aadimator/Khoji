@@ -108,7 +108,7 @@ public class ContactsFragment extends Fragment {
 
     private FirebaseRecyclerAdapter createRecyclerAdapater() {
         Query keyQuery = FirebaseDatabase.getInstance()
-                .getReference(Constant.FIREBASE_URL_TRACKING)
+                .getReference(Constant.FIREBASE_URL_CONTACTS)
                 .child(mCurrentUser.getUid())
                 .orderByKey();
 
@@ -129,7 +129,6 @@ public class ContactsFragment extends Fragment {
 
             @Override
             protected void onBindViewHolder(@NonNull UserHolder holder, int position, @NonNull User model) {
-                Log.i(TAG, model.toString());
                 holder.mTextViewName.setText(model.name);
                 GlideApp.with(mActivity)
                         .load(model.photoUrl)
@@ -160,7 +159,7 @@ public class ContactsFragment extends Fragment {
                     for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
                         User user = userSnapshot.getValue(User.class);
                         database.getReference()
-                                .child(Constant.FIREBASE_URL_TRACKING)
+                                .child(Constant.FIREBASE_URL_CONTACTS)
                                 .child(mCurrentUser.getUid())
                                 .child(userSnapshot.getKey())
                                 .setValue(true);
