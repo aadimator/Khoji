@@ -19,6 +19,8 @@ import com.aadimator.khoji.models.User;
 import com.aadimator.khoji.models.UserLocation;
 import com.aadimator.khoji.utils.Constant;
 import com.aadimator.khoji.utils.LocationHelper;
+import com.aadimator.khoji.widgets.ContactsWidgetProvider;
+import com.aadimator.khoji.widgets.ContactsWidgetService;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -328,7 +330,7 @@ public class MapFragment extends Fragment implements
             } else {
                 Marker marker = mGoogleMap.addMarker(new MarkerOptions()
                         .position(latLng)
-                        .title(user.name));
+                        .title(user.getName()));
                 mContactsMarkers.put(entry.getKey(), marker);
             }
         }

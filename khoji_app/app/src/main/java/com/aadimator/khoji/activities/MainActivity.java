@@ -1,6 +1,7 @@
 package com.aadimator.khoji.activities;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -22,6 +23,7 @@ import com.aadimator.khoji.fragments.AccountFragment;
 import com.aadimator.khoji.fragments.ContactsFragment;
 import com.aadimator.khoji.fragments.MapFragment;
 import com.aadimator.khoji.utils.Constant;
+import com.aadimator.khoji.widgets.ContactsWidgetProvider;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity implements
@@ -33,6 +35,16 @@ public class MainActivity extends AppCompatActivity implements
     private final String FRAGMENT_SAVE_KEY = "saveFragment";
 
     private Fragment mSelectedFragment = null;
+    private String mUID;
+
+    public static final String BUNDLE_CONTACT_DATA =
+            "com.aadimator.khoji.activities.contactId";
+
+    public static Intent newIntent(Context packageContext, String contactId) {
+        Intent intent = new Intent(packageContext, MainActivity.class);
+        intent.putExtra(BUNDLE_CONTACT_DATA, contactId);
+        return intent;
+    }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -61,13 +73,19 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if (getIntent().getExtras().getString(BUNDLE_CONTACT_DATA) != null) {
+            mUID = getIntent().getExtras().getString(BUNDLE_CONTACT_DATA);
+        } else {
+            mUID = FirebaseAuth.getInstance().getUid();
+        }
+
         setTitle(getString(R.string.app_name));
 
         if (savedInstanceState != null) {
             mSelectedFragment = getSupportFragmentManager().getFragment(savedInstanceState,
                     FRAGMENT_SAVE_KEY);
         } else {
-            mSelectedFragment = MapFragment.newInstance(FirebaseAuth.getInstance().getUid());
+            mSelectedFragment = MapFragment.newInstance(mUID);
         }
 
         changeFragment();

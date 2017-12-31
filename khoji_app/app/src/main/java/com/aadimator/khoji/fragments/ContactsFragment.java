@@ -132,9 +132,9 @@ public class ContactsFragment extends Fragment {
 
             @Override
             protected void onBindViewHolder(@NonNull UserHolder holder, final int position, @NonNull final User model) {
-                holder.mTextViewName.setText(model.name);
+                holder.mTextViewName.setText(model.getName());
                 GlideApp.with(mActivity)
-                        .load(model.photoUrl)
+                        .load(model.getPhotoUrl())
                         .placeholder(R.drawable.com_facebook_profile_picture_blank_square)
                         .circleCrop()
                         .into(holder.mImageViewProfile);
@@ -183,7 +183,7 @@ public class ContactsFragment extends Fragment {
                                 .child(Constant.FIREBASE_URL_CONTACTS)
                                 .child(mCurrentUser.getUid())
                                 .child(userSnapshot.getKey())
-                                .setValue(user.name);
+                                .setValue(user.getName());
                         Toast.makeText(mContext, email + " added to Contacts!", Toast.LENGTH_SHORT).show();
                     }
                 } else {
