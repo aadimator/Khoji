@@ -31,7 +31,7 @@ public class BaseActivity extends AppCompatActivity {
         if (auth.getCurrentUser() != null) {
             // already signed in
             updateDB(auth.getCurrentUser());
-            startActivity(new Intent(this, MainActivity.class));
+            startActivity(MainActivity.newIntent(this, auth.getUid()));
             finish();
         } else {
             startActivity(new Intent(this, LoginActivity.class));
