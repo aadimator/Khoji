@@ -59,7 +59,7 @@ public class LoginActivity extends AppCompatActivity {
             } else {
                 // Sign in failed, check response for error code
                 // ...
-                Toast.makeText(this, "Sign-in failed.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.sign_in_failure, Toast.LENGTH_SHORT).show();
                 finish();
             }
         }

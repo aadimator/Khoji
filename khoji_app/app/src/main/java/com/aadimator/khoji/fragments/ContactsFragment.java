@@ -68,10 +68,6 @@ public class ContactsFragment extends Fragment {
     @BindView(R.id.recycler_view_contacts)
     RecyclerView mRecyclerViewContacts;
 
-    public ContactsFragment() {
-        // Required empty public constructor
-    }
-
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -184,11 +180,11 @@ public class ContactsFragment extends Fragment {
                                 .child(mCurrentUser.getUid())
                                 .child(userSnapshot.getKey())
                                 .setValue(user.getName());
-                        Toast.makeText(mContext, email + " added to Contacts!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, getString(R.string.contact_added, email), Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     Log.i(TAG, "No user with " + email + " email");
-                    Toast.makeText(mContext, "No user with " + email + " email", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, getString(R.string.email_not_found, email), Toast.LENGTH_SHORT).show();
                 }
             }
 

@@ -20,5 +20,8 @@
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
     <string name="widget_empty_list_msg">No Contacts</string>
+    <string name="sign_in_failure">Sign-in failed.</string>
+    <string name="contact_added">%1$s added to Contacts!</string>
+    <string name="email_not_found">No user found with %1$s email.</string>
 
 </resources>
