@@ -2,15 +2,18 @@ package com.aadimator.khoji.fragments;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.aadimator.khoji.R;
+import com.aadimator.khoji.activities.ArActivity;
 import com.aadimator.khoji.models.User;
 import com.aadimator.khoji.models.UserLocation;
 import com.aadimator.khoji.utils.Constant;
@@ -196,6 +199,14 @@ public class MapFragment extends Fragment implements
     public void onMapReady(GoogleMap googleMap) {
         mMapReady = true;
         mGoogleMap = googleMap;
+        mGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                Log.d(TAG, "Marker clicked: " + marker.getTitle());
+                startActivity(new Intent(mActivity, ArActivity.class));
+                return false;
+            }
+        });
         updateMap();
     }
 

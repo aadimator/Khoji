@@ -3,6 +3,11 @@
     package="com.aadimator.khoji">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature
+        android:name="android.hardware.camera.ar"
+        android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -28,7 +33,8 @@
         <activity android:name=".activities.LoginActivity" />
         <activity
             android:name=".activities.MainActivity"
-            android:label="@string/title_activity_main" />
+            android:label="@string/title_activity_main"
+            android:launchMode="singleTop" />
 
         <receiver android:name=".widgets.ContactsWidgetProvider">
             <intent-filter>
@@ -53,6 +59,18 @@
                 <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE" />
             </intent-filter>
         </service>
+
+        <activity
+            android:name=".activities.ArActivity"
+            android:configChanges="orientation|screenSize"
+            android:exported="true"
+            android:parentActivityName=".activities.MainActivity"
+            android:screenOrientation="locked"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+
+        <meta-data
+            android:name="com.google.ar.core"
+            android:value="required" />
     </application>
 
 </manifest>
