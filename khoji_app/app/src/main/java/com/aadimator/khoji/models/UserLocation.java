@@ -11,11 +11,12 @@ import com.google.firebase.auth.FirebaseUser;
 public class UserLocation {
 
 
-    private long mTime;
-    private float mSpeed;
-    private double mAltitude;
-    private double mLongitude;
     private double mLatitude;
+    private double mLongitude;
+    private double mAltitude;
+    private float mSpeed;
+    private float mAccuracy;
+    private long mTime;
 
     public UserLocation() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
@@ -27,14 +28,12 @@ public class UserLocation {
         mAltitude = location.getAltitude();
         mSpeed = location.getSpeed();
         mTime = location.getTime();
+        mAccuracy = location.getAccuracy();
     }
 
-    public UserLocation(long time, float speed, double altitude, double longitude, double latitude) {
-        mTime = time;
-        mSpeed = speed;
-        mAltitude = altitude;
-        mLongitude = longitude;
+    public UserLocation(double latitude, double longitude) {
         mLatitude = latitude;
+        mLongitude = longitude;
     }
 
     public long getTime() {
@@ -75,5 +74,24 @@ public class UserLocation {
 
     public void setLatitude(double latitude) {
         mLatitude = latitude;
+    }
+
+    public float getAccuracy() {
+        return mAccuracy;
+    }
+
+    public void setAccuracy(float accuracy) {
+        mAccuracy = accuracy;
+    }
+
+    public Location getLocation() {
+        Location location = new Location(UserLocation.class.getSimpleName());
+        location.setLatitude(mLatitude);
+        location.setLongitude(mLongitude);
+        location.setAltitude(mAltitude);
+        location.setSpeed(mSpeed);
+        location.setTime(mTime);
+        location.setAccuracy(mAccuracy);
+        return location;
     }
 }
