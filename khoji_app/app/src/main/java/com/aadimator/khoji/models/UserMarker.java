@@ -1,13 +1,15 @@
 package com.aadimator.khoji.models;
 
-public class UserMarker {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class UserMarker implements Parcelable {
 
     private User mUser;
     private UserLocation mUserLocation;
 
     private float mDistance;
     private boolean mInRange;
-    private float[] mZeroMatrix;
 
     public UserMarker(User user, UserLocation userLocation) {
         mUser = user;
@@ -46,11 +48,35 @@ public class UserMarker {
         mInRange = inRange;
     }
 
-    public float[] getZeroMatrix() {
-        return mZeroMatrix;
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
-    public void setZeroMatrix(float[] zeroMatrix) {
-        mZeroMatrix = zeroMatrix;
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeParcelable(this.mUser, flags);
+        dest.writeParcelable(this.mUserLocation, flags);
+        dest.writeFloat(this.mDistance);
+        dest.writeByte(this.mInRange ? (byte) 1 : (byte) 0);
     }
+
+    protected UserMarker(Parcel in) {
+        this.mUser = in.readParcelable(User.class.getClassLoader());
+        this.mUserLocation = in.readParcelable(UserLocation.class.getClassLoader());
+        this.mDistance = in.readFloat();
+        this.mInRange = in.readByte() != 0;
+    }
+
+    public static final Parcelable.Creator<UserMarker> CREATOR = new Parcelable.Creator<UserMarker>() {
+        @Override
+        public UserMarker createFromParcel(Parcel source) {
+            return new UserMarker(source);
+        }
+
+        @Override
+        public UserMarker[] newArray(int size) {
+            return new UserMarker[size];
+        }
+    };
 }

@@ -1,14 +1,17 @@
 package com.aadimator.khoji.models;
 
 import android.location.Location;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.Exclude;
 
 /**
  * Created by aadim on 12/26/2017.
  */
 
-public class UserLocation {
+public class UserLocation implements Parcelable {
 
 
     private double mLatitude;
@@ -84,6 +87,7 @@ public class UserLocation {
         mAccuracy = accuracy;
     }
 
+    @Exclude
     public Location getLocation() {
         Location location = new Location(UserLocation.class.getSimpleName());
         location.setLatitude(mLatitude);
@@ -94,4 +98,40 @@ public class UserLocation {
         location.setAccuracy(mAccuracy);
         return location;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeDouble(this.mLatitude);
+        dest.writeDouble(this.mLongitude);
+        dest.writeDouble(this.mAltitude);
+        dest.writeFloat(this.mSpeed);
+        dest.writeFloat(this.mAccuracy);
+        dest.writeLong(this.mTime);
+    }
+
+    protected UserLocation(Parcel in) {
+        this.mLatitude = in.readDouble();
+        this.mLongitude = in.readDouble();
+        this.mAltitude = in.readDouble();
+        this.mSpeed = in.readFloat();
+        this.mAccuracy = in.readFloat();
+        this.mTime = in.readLong();
+    }
+
+    public static final Parcelable.Creator<UserLocation> CREATOR = new Parcelable.Creator<UserLocation>() {
+        @Override
+        public UserLocation createFromParcel(Parcel source) {
+            return new UserLocation(source);
+        }
+
+        @Override
+        public UserLocation[] newArray(int size) {
+            return new UserLocation[size];
+        }
+    };
 }

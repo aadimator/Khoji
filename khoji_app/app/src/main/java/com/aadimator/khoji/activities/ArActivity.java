@@ -1,6 +1,8 @@
 package com.aadimator.khoji.activities;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
@@ -43,12 +45,20 @@ import com.google.ar.core.exceptions.UnavailableUserDeclinedInstallationExceptio
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import uk.co.appoly.arcorelocation.LocationMarker;
+import uk.co.appoly.arcorelocation.LocationScene;
+import uk.co.appoly.arcorelocation.rendering.AnnotationRenderer;
+
 public class ArActivity extends AppCompatActivity implements GLSurfaceView.Renderer {
+
     private static final String TAG = ArActivity.class.getSimpleName();
+
+    public static final String BUNDLE_MARKERS_LIST = "com.aadimator.khoji.activities.markersList";
 
     // Rendering. The Renderers are created here, and initialized when the GL surface is created.
     private GLSurfaceView mSurfaceView;
@@ -63,8 +73,8 @@ public class ArActivity extends AppCompatActivity implements GLSurfaceView.Rende
     private final BackgroundRenderer mBackgroundRenderer = new BackgroundRenderer();
     private final ObjectRenderer mVirtualObject = new ObjectRenderer();
     private final ObjectRenderer mVirtualObjectShadow = new ObjectRenderer();
+    //    private final PointCloudRenderer pointCloudRenderer = new PointCloudRenderer();
 //    private final PlaneRenderer planeRenderer = new PlaneRenderer();
-//    private final PointCloudRenderer pointCloudRenderer = new PointCloudRenderer();
 
     // Temporary matrix allocated here to reduce number of allocations for each frame.
     private final float[] mAnchorMatrix = new float[16];
@@ -72,16 +82,17 @@ public class ArActivity extends AppCompatActivity implements GLSurfaceView.Rende
     // Anchors created from taps used for object placing.
     private final ArrayList<Anchor> mAnchors = new ArrayList<>();
 
+    private LocationScene mLocationScene;
 
-    private List<UserMarker> mMarkerList;
-    private Frame mFrame;
-    private float[] mZeroMatrix = new float[16];
 
-    float[] translation = new float[]{0.0f, -0.8f, -0.8f};
-    float[] rotation = new float[]{0.0f, -1.00f, 0.0f, 0.3f};
+    private ArrayList<UserMarker> mMarkerList;
 
-    Pose mPose = new Pose(translation, rotation);
 
+    public static Intent newIntent(Context packageContext, ArrayList<UserMarker> userMarkers) {
+        Intent intent = new Intent(packageContext, ArActivity.class);
+        intent.putParcelableArrayListExtra(BUNDLE_MARKERS_LIST, userMarkers);
+        return intent;
+    }
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -91,8 +102,11 @@ public class ArActivity extends AppCompatActivity implements GLSurfaceView.Rende
         mSurfaceView = findViewById(R.id.surfaceview);
         mDisplayRotationHelper = new DisplayRotationHelper(/*context=*/ this);
 
-        Matrix.setIdentityM(mZeroMatrix, 0);
-        mPose.toMatrix(mAnchorMatrix, 0);
+        mMarkerList = new ArrayList<>();
+        if (Objects.requireNonNull(getIntent().getExtras())
+                .getParcelableArrayList(BUNDLE_MARKERS_LIST) != null) {
+            mMarkerList = getIntent().getExtras().getParcelableArrayList(BUNDLE_MARKERS_LIST);
+        }
 
         // Set up tap listener.
         mTapHelper = new TapHelper(/*context=*/ this);
@@ -106,19 +120,6 @@ public class ArActivity extends AppCompatActivity implements GLSurfaceView.Rende
         mSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 
         mInstallRequested = false;
-
-        mMarkerList = new ArrayList<>();
-        mMarkerList.add(new UserMarker(
-                new User("Aadam", "aadimator@gmail.com", ""),
-                new UserLocation(33.9859313, 72.9703613))
-        );
-
-        mMarkerList.add(new UserMarker(
-                new User("Demo", "demo@gmail.com", ""),
-                new UserLocation(33.990397, 72.9644243))
-        );
-
-
     }
 
     @Override
@@ -172,9 +173,14 @@ public class ArActivity extends AppCompatActivity implements GLSurfaceView.Rende
             }
         }
 
+        mLocationScene = new LocationScene(this, this, mSession);
+        updateMarkers();
+
+
         // Note that order matters - see the note in onPause(), the reverse applies here.
         try {
             mSession.resume();
+            mLocationScene.resume();
         } catch (CameraNotAvailableException e) {
             // In some cases (such as another camera app launching) the camera may be given to
             // a different app instead. Handle this properly by showing a message and recreate the
@@ -190,6 +196,25 @@ public class ArActivity extends AppCompatActivity implements GLSurfaceView.Rende
         mMessageSnackbarHelper.showMessage(this, "Searching for surfaces...");
     }
 
+    private void updateMarkers() {
+        for (UserMarker marker : mMarkerList) {
+            LocationMarker locationMarker = new LocationMarker(
+                    marker.getUserLocation().getLongitude(),
+                    marker.getUserLocation().getLatitude(),
+                    new AnnotationRenderer(marker.getUser().getName())
+            );
+            locationMarker.setOnTouchListener(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(ArActivity.this,
+                            "Touched Aadam", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            mLocationScene.mLocationMarkers.add(locationMarker);
+        }
+    }
+
     @Override
     public void onPause() {
         super.onPause();
@@ -199,6 +224,7 @@ public class ArActivity extends AppCompatActivity implements GLSurfaceView.Rende
             // still call mSession.update() and get a SessionPausedException.
             mDisplayRotationHelper.onPause();
             mSurfaceView.onPause();
+            mLocationScene.resume();
             mSession.pause();
         }
     }
@@ -305,6 +331,8 @@ public class ArActivity extends AppCompatActivity implements GLSurfaceView.Rende
             // Draw background.
             mBackgroundRenderer.draw(frame);
 
+            mLocationScene.draw(frame);
+
             // If not tracking, don't draw 3d objects.
             if (camera.getTrackingState() == TrackingState.PAUSED) {
                 return;
@@ -338,7 +366,7 @@ public class ArActivity extends AppCompatActivity implements GLSurfaceView.Rende
 //                for (Plane plane : mSession.getAllTrackables(Plane.class)) {
 //                    if (plane.getType() == com.google.ar.core.Plane.Type.HORIZONTAL_UPWARD_FACING
 //                            && plane.getTrackingState() == TrackingState.TRACKING) {
-            mMessageSnackbarHelper.hide(this);
+//            mMessageSnackbarHelper.hide(this);
 //                        break;
 //                    }
 //                }
@@ -350,70 +378,24 @@ public class ArActivity extends AppCompatActivity implements GLSurfaceView.Rende
 
             // Visualize mAnchors created by touch.
             float scaleFactor = 1.0f;
-            UserMarker marker;
+            for (Anchor anchor : mAnchors) {
+                if (anchor.getTrackingState() != TrackingState.TRACKING) {
+                    continue;
+                }
+                // Get the current pose of an Anchor in world space. The Anchor pose is updated
+                // during calls to mSession.update() as ARCore refines its estimate of the world.
+                anchor.getPose().toMatrix(mAnchorMatrix, 0);
 
-            if (mMarkerList.isEmpty()) {
-                return;
-            }
-
-            for (int i = 0; i < mMarkerList.size(); i++) {
-
-                marker = mMarkerList.get(i);
-
-//                if (marker.isInRange()) {
-//                    if (marker.getZeroMatrix() == null) {
-//                        marker.setZeroMatrix(getCalibrationMatrix());
-//                    }
-//                }
-//
-//                if (marker.getZeroMatrix() == null) {
-//                    break;
-//                }
-
-                Matrix.multiplyMM(viewmtx, 0, viewmtx, 0, marker.getZeroMatrix(), 0);
-
+                // Update and draw the model and its shadow.
                 mVirtualObject.updateModelMatrix(mAnchorMatrix, scaleFactor);
                 mVirtualObjectShadow.updateModelMatrix(mAnchorMatrix, scaleFactor);
                 mVirtualObject.draw(viewmtx, projmtx, colorCorrectionRgba);
                 mVirtualObjectShadow.draw(viewmtx, projmtx, colorCorrectionRgba);
-
             }
-//            for (Anchor anchor : mAnchors) {
-//                if (anchor.getTrackingState() != TrackingState.TRACKING) {
-//                    continue;
-//                }
-//                // Get the current pose of an Anchor in world space. The Anchor pose is updated
-//                // during calls to mSession.update() as ARCore refines its estimate of the world.
-//                anchor.getPose().toMatrix(mAnchorMatrix, 0);
-//
-//                // Update and draw the model and its shadow.
-//                mVirtualObject.updateModelMatrix(mAnchorMatrix, scaleFactor);
-//                mVirtualObjectShadow.updateModelMatrix(mAnchorMatrix, scaleFactor);
-//                mVirtualObject.draw(viewmtx, projmtx, colorCorrectionRgba);
-//                mVirtualObjectShadow.draw(viewmtx, projmtx, colorCorrectionRgba);
-//            }
 
         } catch (Throwable t) {
             // Avoid crashing the application due to unhandled exceptions.
             Log.e(TAG, "Exception on the OpenGL thread", t);
         }
     }
-
-//    public float[] getCalibrationMatrix() {
-//        float[] t = new float[3];
-//        float[] m = new float[16];
-//
-//        mFrame.getCamera().getPose().getTranslation(t, 0);
-//        float[] z = mFrame.getCamera().getPose().getZAxis();
-//        Vector3f zAxis = new Vector3f(z[0], z[1], z[2]);
-//        zAxis.y = 0;
-//        zAxis.normalize();
-//
-//        double rotate = Math.atan2(zAxis.x, zAxis.z);
-//
-//        Matrix.setIdentityM(m, 0);
-//        Matrix.translateM(m, 0, t[0], t[1], t[2]);
-//        Matrix.rotateM(m, 0, (float) Math.toDegrees(rotate), 0, 1, 0);
-//        return m;
-//    }
 }

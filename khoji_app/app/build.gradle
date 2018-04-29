@@ -85,6 +85,8 @@ dependencies {
     // Obj - a simple Wavefront OBJ file loader
     // https://github.com/javagl/Obj
     implementation 'de.javagl:obj:0.2.1'
+
+    implementation 'com.github.appoly:ARCore-Location:0.1.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

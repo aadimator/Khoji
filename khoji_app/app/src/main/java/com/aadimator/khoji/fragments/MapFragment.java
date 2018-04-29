@@ -16,6 +16,7 @@ import com.aadimator.khoji.R;
 import com.aadimator.khoji.activities.ArActivity;
 import com.aadimator.khoji.models.User;
 import com.aadimator.khoji.models.UserLocation;
+import com.aadimator.khoji.models.UserMarker;
 import com.aadimator.khoji.utils.Constant;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -32,6 +33,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -98,6 +100,8 @@ public class MapFragment extends Fragment implements
      */
     private HashMap<String, Marker> mContactsMarkers;
 
+    private ArrayList<UserMarker> mUserMarkers;
+
     /**
      * If the camera view has been updated to the user's current location.
      * Should only position once automatically.
@@ -154,6 +158,7 @@ public class MapFragment extends Fragment implements
         mContacts = new HashMap<>();
         mContactsLocations = new HashMap<>();
         mContactsMarkers = new HashMap<>();
+        mUserMarkers = new ArrayList<>();
 
         // Get current's user's location from Firebase DB
         getCurrentLocation();
@@ -203,11 +208,21 @@ public class MapFragment extends Fragment implements
             @Override
             public boolean onMarkerClick(Marker marker) {
                 Log.d(TAG, "Marker clicked: " + marker.getTitle());
-                startActivity(new Intent(mActivity, ArActivity.class));
+                mUserMarkers = getUserMarkers();
+                startActivity(ArActivity.newIntent(mActivity, mUserMarkers));
                 return false;
             }
         });
         updateMap();
+    }
+
+    private ArrayList<UserMarker> getUserMarkers() {
+        ArrayList<UserMarker> userMarkers = new ArrayList<>();
+        for (String key : mContacts.keySet()) {
+            userMarkers.add(new UserMarker(mContacts.get(key), mContactsLocations.get(key)));
+
+        }
+        return userMarkers;
     }
 
     private void updateCameraView(float zoomLevel) {
