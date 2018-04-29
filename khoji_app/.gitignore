@@ -7,3 +7,6 @@
 /build
 /captures
 .externalNativeBuild
+app/keystore.jks
+app/src/main/res/values/secrets.xml
+gradle.properties
