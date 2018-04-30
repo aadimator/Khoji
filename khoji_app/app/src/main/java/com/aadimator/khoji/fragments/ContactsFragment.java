@@ -20,9 +20,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aadimator.khoji.R;
+import com.aadimator.khoji.common.helpers.GlideApp;
 import com.aadimator.khoji.models.User;
 import com.aadimator.khoji.common.Constant;
-import com.aadimator.khoji.utils.GlideApp;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;

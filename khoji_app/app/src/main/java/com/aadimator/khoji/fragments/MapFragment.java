@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.aadimator.khoji.R;
 import com.aadimator.khoji.activities.ArActivity;
@@ -35,6 +36,9 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 
 /**
@@ -115,6 +119,16 @@ public class MapFragment extends Fragment implements
     private String mCameraFocusUid;
     private float mZoomLevel = 15.0f;
 
+    @OnClick(R.id.locateInARButton)
+    public void locateInAR(View view) {
+        mUserMarkers = getUserMarkers();
+        if (mUserMarkers.isEmpty()) {
+            Toast.makeText(mActivity, "No friends nearby", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        startActivity(ArActivity.newIntent(mActivity, mUserMarkers));
+    }
+
 
     /**
      * Create a Map fragment where camera will be focused on the
@@ -170,7 +184,9 @@ public class MapFragment extends Fragment implements
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_map, container, false);
+        View view = inflater.inflate(R.layout.fragment_map, container, false);
+        ButterKnife.bind(this, view);
+        return view;
     }
 
     @Override
@@ -178,7 +194,7 @@ public class MapFragment extends Fragment implements
         super.onViewCreated(view, savedInstanceState);
 
         // Register for the Map callback
-        SupportMapFragment supportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        SupportMapFragment supportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.mapFragment);
         supportMapFragment.getMapAsync(this);
     }
 
