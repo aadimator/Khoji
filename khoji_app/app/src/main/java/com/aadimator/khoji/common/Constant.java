@@ -1,4 +1,4 @@
-package com.aadimator.khoji.utils;
+package com.aadimator.khoji.common;
 
 import com.bumptech.glide.Glide;
 

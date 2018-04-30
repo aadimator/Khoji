@@ -26,7 +26,7 @@ import com.aadimator.khoji.fragments.AccountFragment;
 import com.aadimator.khoji.fragments.ContactsFragment;
 import com.aadimator.khoji.fragments.MapFragment;
 import com.aadimator.khoji.services.LocationJobService;
-import com.aadimator.khoji.utils.Constant;
+import com.aadimator.khoji.common.Constant;
 import com.firebase.jobdispatcher.Constraint;
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.GooglePlayDriver;

@@ -2,7 +2,6 @@ package com.aadimator.khoji.fragments;
 
 import android.app.Activity;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
@@ -22,8 +21,7 @@ import android.widget.Toast;
 
 import com.aadimator.khoji.R;
 import com.aadimator.khoji.models.User;
-import com.aadimator.khoji.models.UserLocation;
-import com.aadimator.khoji.utils.Constant;
+import com.aadimator.khoji.common.Constant;
 import com.aadimator.khoji.utils.GlideApp;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;

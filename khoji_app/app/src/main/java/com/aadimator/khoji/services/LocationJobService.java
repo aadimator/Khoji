@@ -7,7 +7,7 @@ import android.util.Log;
 
 import com.aadimator.khoji.activities.MainActivity;
 import com.aadimator.khoji.models.UserLocation;
-import com.aadimator.khoji.utils.Constant;
+import com.aadimator.khoji.common.Constant;
 import com.firebase.jobdispatcher.JobParameters;
 import com.firebase.jobdispatcher.JobService;
 import com.google.android.gms.location.FusedLocationProviderClient;
