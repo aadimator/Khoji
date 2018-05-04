@@ -5,15 +5,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
-import android.opengl.Matrix;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.widget.Toast;
 
 import com.aadimator.khoji.R;
+import com.aadimator.khoji.common.Constant;
 import com.aadimator.khoji.common.helpers.CameraPermissionHelper;
 import com.aadimator.khoji.common.helpers.DisplayRotationHelper;
 import com.aadimator.khoji.common.helpers.FullScreenHelper;
@@ -28,12 +27,7 @@ import com.google.ar.core.Anchor;
 import com.google.ar.core.ArCoreApk;
 import com.google.ar.core.Camera;
 import com.google.ar.core.Frame;
-import com.google.ar.core.HitResult;
-import com.google.ar.core.Plane;
-import com.google.ar.core.Point;
-import com.google.ar.core.Pose;
 import com.google.ar.core.Session;
-import com.google.ar.core.Trackable;
 import com.google.ar.core.TrackingState;
 import com.google.ar.core.exceptions.CameraNotAvailableException;
 import com.google.ar.core.exceptions.UnavailableApkTooOldException;
@@ -41,10 +35,15 @@ import com.google.ar.core.exceptions.UnavailableArcoreNotInstalledException;
 import com.google.ar.core.exceptions.UnavailableDeviceNotCompatibleException;
 import com.google.ar.core.exceptions.UnavailableSdkTooOldException;
 import com.google.ar.core.exceptions.UnavailableUserDeclinedInstallationException;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -56,41 +55,36 @@ import uk.co.appoly.arcorelocation.rendering.AnnotationRenderer;
 
 public class ArActivity extends AppCompatActivity implements GLSurfaceView.Renderer {
 
-    private static final String TAG = ArActivity.class.getSimpleName();
-
     public static final String BUNDLE_MARKERS_LIST = "com.aadimator.khoji.activities.markersList";
-
-    // Rendering. The Renderers are created here, and initialized when the GL surface is created.
-    private GLSurfaceView mSurfaceView;
-
-    private boolean mInstallRequested;
-
-    private Session mSession;
+    public static final String BUNDLE_CONTACT_ID_LIST = "com.aadimator.khoji.activities.contactIdsList";
+    private static final String TAG = ArActivity.class.getSimpleName();
     private final SnackbarHelper mMessageSnackbarHelper = new SnackbarHelper();
-    private DisplayRotationHelper mDisplayRotationHelper;
-    private TapHelper mTapHelper;
-
     private final BackgroundRenderer mBackgroundRenderer = new BackgroundRenderer();
     private final ObjectRenderer mVirtualObject = new ObjectRenderer();
     private final ObjectRenderer mVirtualObjectShadow = new ObjectRenderer();
-    //    private final PointCloudRenderer pointCloudRenderer = new PointCloudRenderer();
-//    private final PlaneRenderer planeRenderer = new PlaneRenderer();
-
     // Temporary matrix allocated here to reduce number of allocations for each frame.
     private final float[] mAnchorMatrix = new float[16];
-
     // Anchors created from taps used for object placing.
     private final ArrayList<Anchor> mAnchors = new ArrayList<>();
-
+    // Rendering. The Renderers are created here, and initialized when the GL surface is created.
+    private GLSurfaceView mSurfaceView;
+    private boolean mInstallRequested;
+    private Session mSession;
+    //    private final PointCloudRenderer pointCloudRenderer = new PointCloudRenderer();
+//    private final PlaneRenderer planeRenderer = new PlaneRenderer();
+    private DisplayRotationHelper mDisplayRotationHelper;
+    private TapHelper mTapHelper;
     private LocationScene mLocationScene;
 
 
-    private ArrayList<UserMarker> mMarkerList;
+    private HashMap<String, UserMarker> mMarkerList;
+    private ArrayList<String> mContactIds;
 
 
-    public static Intent newIntent(Context packageContext, ArrayList<UserMarker> userMarkers) {
+    public static Intent newIntent(Context packageContext,
+                                   HashMap<String, UserMarker> userMarkers) {
         Intent intent = new Intent(packageContext, ArActivity.class);
-        intent.putParcelableArrayListExtra(BUNDLE_MARKERS_LIST, userMarkers);
+        intent.putExtra(BUNDLE_MARKERS_LIST, userMarkers);
         return intent;
     }
 
@@ -102,10 +96,10 @@ public class ArActivity extends AppCompatActivity implements GLSurfaceView.Rende
         mSurfaceView = findViewById(R.id.surfaceview);
         mDisplayRotationHelper = new DisplayRotationHelper(/*context=*/ this);
 
-        mMarkerList = new ArrayList<>();
+        mMarkerList = new HashMap<>();
         if (Objects.requireNonNull(getIntent().getExtras())
-                .getParcelableArrayList(BUNDLE_MARKERS_LIST) != null) {
-            mMarkerList = getIntent().getExtras().getParcelableArrayList(BUNDLE_MARKERS_LIST);
+                .get(BUNDLE_MARKERS_LIST) != null) {
+            mMarkerList = (HashMap<String, UserMarker>) getIntent().getExtras().getSerializable(BUNDLE_MARKERS_LIST);
         }
 
         // Set up tap listener.
@@ -176,6 +170,8 @@ public class ArActivity extends AppCompatActivity implements GLSurfaceView.Rende
         mLocationScene = new LocationScene(this, this, mSession);
         updateMarkers();
 
+        listenForUpdates();
+
 
         // Note that order matters - see the note in onPause(), the reverse applies here.
         try {
@@ -196,8 +192,34 @@ public class ArActivity extends AppCompatActivity implements GLSurfaceView.Rende
         mMessageSnackbarHelper.showMessage(this, "Searching for surfaces...");
     }
 
+    private void listenForUpdates() {
+        for (final String key : mMarkerList.keySet()) {
+            FirebaseDatabase.getInstance()
+                    .getReference(Constant.FIREBASE_URL_LOCATIONS)
+                    .child(key)
+                    .orderByKey()
+                    .addValueEventListener(
+                            new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    UserLocation location = dataSnapshot.getValue(UserLocation.class);
+                                    UserMarker userMarker = mMarkerList.get(key);
+                                    userMarker.setUserLocation(location);
+                                    mMarkerList.put(key, userMarker);
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            }
+                    );
+        }
+    }
+
     private void updateMarkers() {
-        for (UserMarker marker : mMarkerList) {
+        for (Map.Entry<String, UserMarker> entry : mMarkerList.entrySet()) {
+            UserMarker marker = entry.getValue();
             LocationMarker locationMarker = new LocationMarker(
                     marker.getUserLocation().getLongitude(),
                     marker.getUserLocation().getLatitude(),

@@ -52,12 +52,9 @@ import butterknife.OnClick;
 public class MapFragment extends Fragment implements
         OnMapReadyCallback {
 
+    private static final String ARG_UID = "uid";
     private final String TAG = MapFragment.class.getSimpleName();
     private Activity mActivity;
-
-    private static final String ARG_UID = "uid";
-
-
     /**
      * The listener implemented by the Activity for communication with fragment.
      */
@@ -103,7 +100,7 @@ public class MapFragment extends Fragment implements
      */
     private HashMap<String, Marker> mContactsMarkers;
 
-    private ArrayList<UserMarker> mUserMarkers;
+    private HashMap<String, UserMarker> mUserMarkers;
 
     /**
      * If the camera view has been updated to the user's current location.
@@ -119,17 +116,6 @@ public class MapFragment extends Fragment implements
     private String mCameraFocusUid;
     private float mZoomLevel = 15.0f;
 
-    @OnClick(R.id.locateInARButton)
-    public void locateInAR(View view) {
-        mUserMarkers = getUserMarkers();
-        if (mUserMarkers.isEmpty()) {
-            Toast.makeText(mActivity, "No friends nearby", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        startActivity(ArActivity.newIntent(mActivity, mUserMarkers));
-    }
-
-
     /**
      * Create a Map fragment where camera will be focused on the
      * user's location provided in the args.
@@ -143,6 +129,16 @@ public class MapFragment extends Fragment implements
         args.putString(ARG_UID, cameraFocusUid);
         mapFragment.setArguments(args);
         return mapFragment;
+    }
+
+    @OnClick(R.id.locateInARButton)
+    public void locateInAR(View view) {
+        mUserMarkers = getUserMarkers();
+        if (mUserMarkers.isEmpty()) {
+            Toast.makeText(mActivity, "No friends nearby", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        startActivity(ArActivity.newIntent(mActivity, mUserMarkers));
     }
 
     @Override
@@ -171,7 +167,7 @@ public class MapFragment extends Fragment implements
         mContacts = new HashMap<>();
         mContactsLocations = new HashMap<>();
         mContactsMarkers = new HashMap<>();
-        mUserMarkers = new ArrayList<>();
+        mUserMarkers = new HashMap<>();
 
         // Get current's user's location from Firebase DB
         getCurrentLocation();
@@ -231,10 +227,10 @@ public class MapFragment extends Fragment implements
         updateMap();
     }
 
-    private ArrayList<UserMarker> getUserMarkers() {
-        ArrayList<UserMarker> userMarkers = new ArrayList<>();
+    private HashMap<String, UserMarker> getUserMarkers() {
+        HashMap<String, UserMarker> userMarkers = new HashMap<>();
         for (String key : mContacts.keySet()) {
-            userMarkers.add(new UserMarker(mContacts.get(key), mContactsLocations.get(key)));
+            userMarkers.put(key, new UserMarker(mContacts.get(key), mContactsLocations.get(key)));
 
         }
         return userMarkers;
