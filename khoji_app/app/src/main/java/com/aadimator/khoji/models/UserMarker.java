@@ -1,8 +1,10 @@
 package com.aadimator.khoji.models;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -15,6 +17,8 @@ import java.util.concurrent.CompletableFuture;
 
 import uk.co.appoly.arcorelocation.LocationMarker;
 import uk.co.appoly.arcorelocation.LocationScene;
+import uk.co.appoly.arcorelocation.rendering.LocationNode;
+import uk.co.appoly.arcorelocation.rendering.LocationNodeRender;
 
 public class UserMarker implements Parcelable {
 
@@ -47,6 +51,7 @@ public class UserMarker implements Parcelable {
         this.mInRange = in.readByte() != 0;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void render(Context c, LocationScene locationScene) {
 
         CompletableFuture<ViewRenderable> couponLayout =
@@ -69,10 +74,9 @@ public class UserMarker implements Parcelable {
                                 ViewRenderable vr = couponLayout.get();
                                 Node base = new Node();
                                 base.setRenderable(vr);
+
                                 TextView title = vr.getView().findViewById(R.id.nodeName);
-
                                 title.setText(mUser.getName());
-
 
                                 LocationMarker couponLocationMarker = new LocationMarker(
                                         mUserLocation.getLongitude(),
@@ -80,13 +84,17 @@ public class UserMarker implements Parcelable {
                                         base
                                 );
 
-                                couponLocationMarker.setRenderEvent(node -> {
-                                    View eView = vr.getView();
-                                    TextView distanceTextView = eView.findViewById(R.id.nodeDistance);
-                                    distanceTextView.setText(node.getDistance() + "M");
+                                couponLocationMarker.setRenderEvent(new LocationNodeRender() {
+                                    @Override
+                                    public void render(LocationNode locationNode) {
+                                        View eView = vr.getView();
+                                        TextView distanceTextView = eView.findViewById(R.id.nodeDistance);
+                                        distanceTextView.setText(locationNode.getDistance() + "M");
+                                    }
                                 });
 
                                 locationScene.mLocationMarkers.add(couponLocationMarker);
+                                locationScene.refreshAnchors();
 
                             } catch (Exception ex) {
                                 ex.printStackTrace();

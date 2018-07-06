@@ -10,7 +10,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aadimator.khoji.R;
@@ -41,10 +40,7 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import uk.co.appoly.arcorelocation.LocationMarker;
 import uk.co.appoly.arcorelocation.LocationScene;
-import uk.co.appoly.arcorelocation.rendering.LocationNode;
-import uk.co.appoly.arcorelocation.rendering.LocationNodeRender;
 import uk.co.appoly.arcorelocation.utils.ARLocationPermissionHelper;
 
 /**
@@ -56,6 +52,7 @@ public class ArActivity extends AppCompatActivity {
     public static final String BUNDLE_MARKERS_LIST = "com.aadimator.khoji.activities.markersList";
     public static final String BUNDLE_CONTACT_ID_LIST = "com.aadimator.khoji.activities.contactIdsList";
     private static final String TAG = ArActivity.class.getSimpleName();
+
     // Temporary matrix allocated here to reduce number of allocations for each frame.
     private final float[] mAnchorMatrix = new float[16];
     // Anchors created from taps used for object placing.
@@ -70,7 +67,7 @@ public class ArActivity extends AppCompatActivity {
     // Our ARCore-Location scene
     private LocationScene locationScene;
     private HashMap<String, UserMarker> mMarkerList;
-    private ArrayList<String> mContactIds;
+    private ArrayList<String> mContactIds = new ArrayList<>();
 
 
     public static Intent newIntent(Context packageContext,
@@ -80,6 +77,7 @@ public class ArActivity extends AppCompatActivity {
         return intent;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     @SuppressWarnings({"AndroidApiChecker", "FutureReturnValueIgnored"})
     // CompletableFuture requires api level 24
@@ -104,14 +102,15 @@ public class ArActivity extends AppCompatActivity {
 
         // When you build a Renderable, Sceneform loads its resources in the background while returning
         // a CompletableFuture. Call thenAccept(), handle(), or check isDone() before calling get().
-        CompletableFuture<ModelRenderable> andy = ModelRenderable.builder()
-                .setSource(this, R.raw.andy)
-                .build();
+//        CompletableFuture<ModelRenderable> andy = ModelRenderable.builder()
+//                .setSource(this, R.raw.andy)
+//                .build();
 
 
         CompletableFuture.allOf(
-                exampleLayout,
-                andy)
+                exampleLayout)
+//                ,
+//                andy)
                 .handle(
                         (notUsed, throwable) -> {
                             // When you build a Renderable, Sceneform loads its resources in the background while
@@ -125,7 +124,7 @@ public class ArActivity extends AppCompatActivity {
 
                             try {
                                 exampleLayoutRenderable = exampleLayout.get();
-                                andyRenderable = andy.get();
+//                                andyRenderable = andy.get();
                                 hasFinishedLoading = true;
 
                             } catch (InterruptedException | ExecutionException ex) {
@@ -149,11 +148,17 @@ public class ArActivity extends AppCompatActivity {
                                 // If our locationScene object hasn't been setup yet, this is a good time to do it
                                 // We know that here, the AR components have been initiated.
                                 locationScene = new LocationScene(this, this, arSceneView);
+                                // stop trying to refine the angles so often
+                                locationScene.setMinimalRefreshing(true);
+                                // refresh only when it detects a location change from the device
+                                locationScene.setRefreshAnchorsAsLocationChanges(true);
+//                                locationScene.setAnchorRefreshInterval(60);
 
                                 // Now lets create our location markers.
                                 for (Map.Entry<String, UserMarker> entry : mMarkerList.entrySet()) {
                                     UserMarker marker = entry.getValue();
                                     marker.render(this, locationScene);
+                                    mContactIds.add(marker.getUser().getEmail());
                                 }
                             }
 
@@ -179,14 +184,6 @@ public class ArActivity extends AppCompatActivity {
                             }
                         });
 
-        // stop trying to refine the angles so often
-        locationScene.setMinimalRefreshing(true);
-
-        // refresh only when it detects a location change from the device
-        locationScene.setRefreshAnchorsAsLocationChanges(true);
-
-//        locationScene.setAnchorRefreshInterval(30);
-
         listenForUpdates();
 
 
@@ -202,12 +199,27 @@ public class ArActivity extends AppCompatActivity {
                     .orderByKey()
                     .addValueEventListener(
                             new ValueEventListener() {
+                                @RequiresApi(api = Build.VERSION_CODES.N)
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     UserLocation location = dataSnapshot.getValue(UserLocation.class);
                                     UserMarker userMarker = mMarkerList.get(key);
                                     userMarker.setUserLocation(location);
                                     mMarkerList.put(key, userMarker);
+                                    if (!mContactIds.isEmpty()) {
+                                        int markerIndex = mContactIds.indexOf(userMarker.getUser().getEmail());
+                                        locationScene.mLocationMarkers.get(markerIndex).anchorNode.getAnchor().detach();
+                                        locationScene.mLocationMarkers.get(markerIndex).anchorNode.setAnchor(null);
+                                        locationScene.mLocationMarkers.get(markerIndex).anchorNode.setEnabled(false);
+                                        locationScene.mLocationMarkers.get(markerIndex).anchorNode = null;
+                                        locationScene.mLocationMarkers.remove(markerIndex);
+                                        userMarker.render(getApplicationContext(), locationScene);
+
+                                        // Remove the current user from ContactIds so indexes don't clash
+                                        mContactIds.remove(markerIndex);
+                                        mContactIds.add(userMarker.getUser().getEmail());
+//                                        locationScene.refreshAnchors();
+                                    }
                                 }
 
                                 @Override
@@ -244,6 +256,7 @@ public class ArActivity extends AppCompatActivity {
      *
      * @return Node base.
      */
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private Node getExampleView() {
         Node base = new Node();
         base.setRenderable(exampleLayoutRenderable);
