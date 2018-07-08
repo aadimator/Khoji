@@ -3,13 +3,16 @@ package com.aadimator.khoji.fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.aadimator.khoji.R;
@@ -26,6 +29,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.ar.core.ArCoreApk;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -37,6 +41,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -54,67 +59,58 @@ public class MapFragment extends Fragment implements
 
     private static final String ARG_UID = "uid";
     private final String TAG = MapFragment.class.getSimpleName();
+    @BindView(R.id.locateInARButton)
+    FloatingActionButton mArButton;
     private Activity mActivity;
     /**
      * The listener implemented by the Activity for communication with fragment.
      */
     private OnFragmentInteractionListener mListener;
-
     /**
      * Reference to the currently logged in user.
      */
     private FirebaseUser mCurrentUser;
-
     /**
      * Stores the Users in the mCurrentUser's contacts.
      */
     private HashMap<String, User> mContacts;
-
     /**
      * Stores the Location of the mCurrentUser's contacts.
      */
     private HashMap<String, UserLocation> mContactsLocations;
-
     /**
      * Represents a geographical location.
      */
     private UserLocation mCurrentLocation;
-
     /**
      * Is map ready
      */
     private boolean mMapReady = false;
-
     /**
      * Represents a map.
      */
     private GoogleMap mGoogleMap;
-
     /**
      * Represents the position of the current user.
      */
     private Marker mCurrentUserMarker;
-
     /**
      * Stores the markers of all the contacts
      */
     private HashMap<String, Marker> mContactsMarkers;
-
     private HashMap<String, UserMarker> mUserMarkers;
-
     /**
      * If the camera view has been updated to the user's current location.
      * Should only position once automatically.
      */
     private boolean mCameraViewUpdated = false;
-
     /**
      * If the user is requesting the location updates or not.
      */
     private boolean mRequestingLocationUpdates = true;
-
     private String mCameraFocusUid;
     private float mZoomLevel = 15.0f;
+    private boolean mArAvailable = false;
 
     /**
      * Create a Map fragment where camera will be focused on the
@@ -138,7 +134,34 @@ public class MapFragment extends Fragment implements
             Toast.makeText(mActivity, "No friends nearby", Toast.LENGTH_SHORT).show();
             return;
         }
-        startActivity(ArActivity.newIntent(mActivity, mUserMarkers));
+        if (mArAvailable) {
+            startActivity(ArActivity.newIntent(mActivity, mUserMarkers));
+        } else {
+            Toast.makeText(mActivity, "AR isn't supported on this device.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    void maybeEnableArButton() {
+        ArCoreApk.Availability availability = ArCoreApk.getInstance().checkAvailability(mActivity);
+        if (availability.isTransient()) {
+            // re-query at 5Hz while we check compatibility.
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    maybeEnableArButton();
+                }
+            }, 200);
+        }
+        if (availability.isSupported()) {
+            mArButton.setVisibility(View.VISIBLE);
+            mArButton.setEnabled(true);
+            mArAvailable = true;
+            // indicator on the button.
+        } else { // unsupported or unknown
+            mArButton.setVisibility(View.INVISIBLE);
+            mArButton.setEnabled(false);
+            mArAvailable = false;
+        }
     }
 
     @Override
@@ -182,6 +205,9 @@ public class MapFragment extends Fragment implements
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_map, container, false);
         ButterKnife.bind(this, view);
+
+        maybeEnableArButton();
+
         return view;
     }
 
@@ -215,15 +241,15 @@ public class MapFragment extends Fragment implements
     public void onMapReady(GoogleMap googleMap) {
         mMapReady = true;
         mGoogleMap = googleMap;
-        mGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                Log.d(TAG, "Marker clicked: " + marker.getTitle());
-                mUserMarkers = getUserMarkers();
-                startActivity(ArActivity.newIntent(mActivity, mUserMarkers));
-                return false;
-            }
-        });
+//        mGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+//            @Override
+//            public boolean onMarkerClick(Marker marker) {
+//                Log.d(TAG, "Marker clicked: " + marker.getTitle());
+//                mUserMarkers = getUserMarkers();
+//                startActivity(ArActivity.newIntent(mActivity, mUserMarkers));
+//                return false;
+//            }
+//        });
         updateMap();
     }
 

@@ -21,15 +21,15 @@ android {
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
-        ndk {
-            /*
-             * Sceneform is available for the following ABIs: arm64-v8a, armv7a,
-             * x86_64 and x86. This sample app enables arm64-v8a to run on
-             * devices and x86 to run on the emulator. Your application should
-             * list the ABIs most appropriate to minimize APK size (arm64-v8a recommended).
-             */
-            abiFilters 'arm64-v8a', 'x86'
-        }
+//        ndk {
+//            /*
+//             * Sceneform is available for the following ABIs: arm64-v8a, armv7a,
+//             * x86_64 and x86. This sample app enables arm64-v8a to run on
+//             * devices and x86 to run on the emulator. Your application should
+//             * list the ABIs most appropriate to minimize APK size (arm64-v8a recommended).
+//             */
+//            abiFilters 'arm64-v8a', 'x86'
+//        }
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         resConfigs "en"
         vectorDrawables.useSupportLibrary = true
