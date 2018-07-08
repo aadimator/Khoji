@@ -7,9 +7,11 @@ import android.os.Parcelable;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.aadimator.khoji.R;
+import com.aadimator.khoji.common.helpers.GlideApp;
 import com.google.ar.sceneform.Node;
 import com.google.ar.sceneform.rendering.ViewRenderable;
 
@@ -56,7 +58,7 @@ public class UserMarker implements Parcelable {
 
         CompletableFuture<ViewRenderable> couponLayout =
                 ViewRenderable.builder()
-                        .setView(c, R.layout.example_layout)
+                        .setView(c, R.layout.ar_marker_layout)
                         .build();
 
 
@@ -78,20 +80,28 @@ public class UserMarker implements Parcelable {
                                 TextView title = vr.getView().findViewById(R.id.nodeName);
                                 title.setText(mUser.getName());
 
+                                ImageView imageView = vr.getView().findViewById(R.id.nodeImage);
+
+                                GlideApp.with(c)
+                                        .load(mUser.getPhotoUrl())
+                                        .placeholder(R.drawable.com_facebook_profile_picture_blank_square)
+                                        .circleCrop()
+                                        .into(imageView);
+
                                 LocationMarker couponLocationMarker = new LocationMarker(
                                         mUserLocation.getLongitude(),
                                         mUserLocation.getLatitude(),
                                         base
                                 );
 
-                                couponLocationMarker.setRenderEvent(new LocationNodeRender() {
-                                    @Override
-                                    public void render(LocationNode locationNode) {
-                                        View eView = vr.getView();
-                                        TextView distanceTextView = eView.findViewById(R.id.nodeDistance);
-                                        distanceTextView.setText(locationNode.getDistance() + "M");
-                                    }
-                                });
+//                                couponLocationMarker.setRenderEvent(new LocationNodeRender() {
+//                                    @Override
+//                                    public void render(LocationNode locationNode) {
+//                                        View eView = vr.getView();
+//                                        TextView distanceTextView = eView.findViewById(R.id.nodeDistance);
+//                                        distanceTextView.setText(locationNode.getDistance() + "M");
+//                                    }
+//                                });
 
                                 locationScene.mLocationMarkers.add(couponLocationMarker);
                                 locationScene.refreshAnchors();

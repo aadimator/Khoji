@@ -97,7 +97,7 @@ public class ArActivity extends AppCompatActivity {
         // Build a renderable from a 2D View.
         CompletableFuture<ViewRenderable> exampleLayout =
                 ViewRenderable.builder()
-                        .setView(this, R.layout.example_layout)
+                        .setView(this, R.layout.ar_marker_layout)
                         .build();
 
         // When you build a Renderable, Sceneform loads its resources in the background while returning

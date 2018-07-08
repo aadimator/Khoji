@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/contactView"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="#a70a04"
+    app:layout_constraintEnd_toStartOf="@+id/buttonDelete"
+    app:layout_constraintStart_toStartOf="parent">
+
+    <ImageView
+        android:id="@+id/nodeImage"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_margin="8dp"
+        android:layout_weight="1"
+        android:contentDescription="@string/profile_picture_content_description"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/com_facebook_profile_picture_blank_square" />
+
+    <TextView
+        android:id="@+id/nodeName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_weight="1"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="#fff"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toBottomOf="@+id/imageViewProfile"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/nodeImage"
+        app:layout_constraintTop_toTopOf="@+id/nodeImage"
+        tools:text="Dr. Shafqat Mehmood" />
+</android.support.constraint.ConstraintLayout><!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"--><!--xmlns:tools="http://schemas.android.com/tools"--><!--android:layout_width="wrap_content"--><!--android:layout_height="wrap_content"--><!--android:alpha="0.93"--><!--android:background="#a70a04"--><!--android:orientation="vertical"--><!--android:padding="30dp">-->
+
+    <!--<TextView--><!--android:id="@+id/nodeName"--><!--android:layout_width="match_parent"--><!--android:layout_height="wrap_content"--><!--android:textColor="#fff"--><!--android:textSize="30sp"--><!--tools:text="Dragon Warrior" />-->
+
+    <!--<TextView--><!--android:id="@+id/nodeDistance"--><!--android:layout_width="match_parent"--><!--android:layout_height="wrap_content"--><!--android:textAlignment="textEnd"--><!--android:textColor="#fff"--><!--android:textSize="24sp"--><!--tools:text="32 M" />--><!--</LinearLayout>-->
