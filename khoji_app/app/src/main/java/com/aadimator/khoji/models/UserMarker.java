@@ -21,6 +21,7 @@ import uk.co.appoly.arcorelocation.LocationMarker;
 import uk.co.appoly.arcorelocation.LocationScene;
 import uk.co.appoly.arcorelocation.rendering.LocationNode;
 import uk.co.appoly.arcorelocation.rendering.LocationNodeRender;
+import uk.co.appoly.arcorelocation.utils.LocationUtils;
 
 public class UserMarker implements Parcelable {
 
@@ -94,14 +95,14 @@ public class UserMarker implements Parcelable {
                                         base
                                 );
 
-//                                couponLocationMarker.setRenderEvent(new LocationNodeRender() {
-//                                    @Override
-//                                    public void render(LocationNode locationNode) {
-//                                        View eView = vr.getView();
-//                                        TextView distanceTextView = eView.findViewById(R.id.nodeDistance);
-//                                        distanceTextView.setText(locationNode.getDistance() + "M");
-//                                    }
-//                                });
+                                couponLocationMarker.setRenderEvent(new LocationNodeRender() {
+                                    @Override
+                                    public void render(LocationNode locationNode) {
+                                        View eView = vr.getView();
+                                        TextView distanceTextView = eView.findViewById(R.id.nodeDistance);
+                                        distanceTextView.setText(locationNode.getDistance() + "M");
+                                    }
+                                });
 
                                 locationScene.mLocationMarkers.add(couponLocationMarker);
                                 locationScene.refreshAnchors();
@@ -111,6 +112,16 @@ public class UserMarker implements Parcelable {
                             }
                             return null;
                         });
+    }
+
+    public boolean locationChanged(UserLocation newLocation) {
+        return mUserLocation.getLongitude() != newLocation.getLongitude() ||
+                mUserLocation.getLatitude() != newLocation.getLatitude();
+    }
+
+    public boolean locationChangedBy(UserLocation newLocation, int limit) {
+        int markerDistance = (int) Math.ceil(LocationUtils.distance(this.mUserLocation.getLatitude(), newLocation.getLatitude(), mUserLocation.getLongitude(), newLocation.getLongitude(), 0.0D, 0.0D));
+        return markerDistance > limit;
     }
 
     public User getUser() {

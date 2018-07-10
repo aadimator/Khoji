@@ -153,6 +153,7 @@ public class ArActivity extends AppCompatActivity {
                                 // refresh only when it detects a location change from the device
                                 locationScene.setRefreshAnchorsAsLocationChanges(true);
 //                                locationScene.setAnchorRefreshInterval(60);
+                                locationScene.setOffsetOverlapping(true);
 
                                 // Now lets create our location markers.
                                 for (Map.Entry<String, UserMarker> entry : mMarkerList.entrySet()) {
@@ -204,21 +205,26 @@ public class ArActivity extends AppCompatActivity {
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     UserLocation location = dataSnapshot.getValue(UserLocation.class);
                                     UserMarker userMarker = mMarkerList.get(key);
-                                    userMarker.setUserLocation(location);
-                                    mMarkerList.put(key, userMarker);
-                                    if (!mContactIds.isEmpty()) {
-                                        int markerIndex = mContactIds.indexOf(userMarker.getUser().getEmail());
-                                        locationScene.mLocationMarkers.get(markerIndex).anchorNode.getAnchor().detach();
-                                        locationScene.mLocationMarkers.get(markerIndex).anchorNode.setAnchor(null);
-                                        locationScene.mLocationMarkers.get(markerIndex).anchorNode.setEnabled(false);
-                                        locationScene.mLocationMarkers.get(markerIndex).anchorNode = null;
-                                        locationScene.mLocationMarkers.remove(markerIndex);
-                                        userMarker.render(getApplicationContext(), locationScene);
+                                    // if location changed by 1 meter.
+                                    if (userMarker.locationChangedBy(location, 1)) {
+                                        userMarker.setUserLocation(location);
+                                        mMarkerList.put(key, userMarker);
+                                        if (!mContactIds.isEmpty() && locationScene != null && !locationScene.mLocationMarkers.isEmpty()) {
+                                            int markerIndex = mContactIds.indexOf(userMarker.getUser().getEmail());
+                                            if (markerIndex == -1 || markerIndex >= locationScene.mLocationMarkers.size())
+                                                return;
+                                            locationScene.mLocationMarkers.get(markerIndex).anchorNode.getAnchor().detach();
+                                            locationScene.mLocationMarkers.get(markerIndex).anchorNode.setAnchor(null);
+                                            locationScene.mLocationMarkers.get(markerIndex).anchorNode.setEnabled(false);
+                                            locationScene.mLocationMarkers.get(markerIndex).anchorNode = null;
+                                            locationScene.mLocationMarkers.remove(markerIndex);
+                                            userMarker.render(getApplicationContext(), locationScene);
 
-                                        // Remove the current user from ContactIds so indexes don't clash
-                                        mContactIds.remove(markerIndex);
-                                        mContactIds.add(userMarker.getUser().getEmail());
+                                            // Remove the current user from ContactIds so indexes don't clash
+                                            mContactIds.remove(markerIndex);
+                                            mContactIds.add(userMarker.getUser().getEmail());
 //                                        locationScene.refreshAnchors();
+                                        }
                                     }
                                 }
 
