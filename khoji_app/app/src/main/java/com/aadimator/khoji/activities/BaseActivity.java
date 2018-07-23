@@ -14,16 +14,16 @@ import com.google.firebase.database.FirebaseDatabase;
 
 public class BaseActivity extends AppCompatActivity {
 
+    static {
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
 
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-
         FirebaseAuth auth = FirebaseAuth.getInstance();
-
 
         if (auth.getCurrentUser() != null) {
             // already signed in

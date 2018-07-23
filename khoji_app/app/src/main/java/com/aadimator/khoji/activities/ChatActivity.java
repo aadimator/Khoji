@@ -2,9 +2,8 @@ package com.aadimator.khoji.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,21 +13,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.ListView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.aadimator.khoji.R;
 import com.aadimator.khoji.common.Constant;
-import com.aadimator.khoji.common.GlideApp;
-import com.aadimator.khoji.fragments.ContactsFragment;
 import com.aadimator.khoji.models.ChatMessage;
 import com.aadimator.khoji.models.User;
-import com.firebase.ui.database.FirebaseListAdapter;
-import com.firebase.ui.database.FirebaseListOptions;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -77,20 +70,22 @@ public class ChatActivity extends AppCompatActivity {
 
     @OnClick(R.id.button_send_message)
     public void sendMessage(View view) {
-        FirebaseDatabase.getInstance()
-                .getReference(Constant.FIREBASE_URL_CHATS)
-                .child(mRoomId)
-                .push()
-                .setValue(
-                        new ChatMessage(
-                                mEditTextMessage.getText().toString(),
-                                mCurrentUserId,
-                                mCurrentUser.getDisplayName()
-                        )
-                );
+        if (!mEditTextMessage.getText().toString().matches("")) {
+            FirebaseDatabase.getInstance()
+                    .getReference(Constant.FIREBASE_URL_CHATS)
+                    .child(mRoomId)
+                    .push()
+                    .setValue(
+                            new ChatMessage(
+                                    mEditTextMessage.getText().toString(),
+                                    mCurrentUserId,
+                                    mCurrentUser.getDisplayName()
+                            )
+                    );
 
-        // Clear the input
-        mEditTextMessage.setText("");
+            // Clear the input
+            mEditTextMessage.setText("");
+        }
     }
 
     @Override
@@ -114,7 +109,21 @@ public class ChatActivity extends AppCompatActivity {
         getOtherUser();
 
         mRecyclerAdapter = createRecyclerAdapater();
-        mRecyclerViewMessages.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+
+        // scroll to the latest message.
+        mRecyclerAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                linearLayoutManager.smoothScrollToPosition
+                        (
+                                mRecyclerViewMessages,
+                                null,
+                                mRecyclerAdapter.getItemCount()
+                        );
+            }
+        });
+        mRecyclerViewMessages.setLayoutManager(linearLayoutManager);
         mRecyclerViewMessages.setAdapter(mRecyclerAdapter);
     }
 
@@ -177,6 +186,7 @@ public class ChatActivity extends AppCompatActivity {
                 holder.mTextViewTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)",
                         model.getTime()));
                 holder.mTextViewMessage.setText(model.getText());
+//                holder.mRelativeLayoutMessageBox.setBackgroundColor(Color.BLUE);
             }
 
             @Override
@@ -195,6 +205,8 @@ public class ChatActivity extends AppCompatActivity {
         TextView mTextViewTime;
         @BindView(R.id.message_text)
         TextView mTextViewMessage;
+        @BindView(R.id.rl_message_box)
+        RelativeLayout mRelativeLayoutMessageBox;
 
         ChatHolder(View itemView) {
             super(itemView);
