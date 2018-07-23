@@ -8,23 +8,27 @@
 
     <EditText
         android:id="@+id/edit_text_email"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:ems="10"
         android:hint="@string/enter_email"
         android:inputType="textEmailAddress"
+        app:layout_constraintEnd_toStartOf="@id/button_add_contact"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
+    <ImageButton
         android:id="@+id/button_add_contact"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:background="@drawable/ic_person_add"
+        android:backgroundTint="@color/colorAccent"
         android:text="@string/add_contact_btn_txt"
         app:layout_constraintBottom_toBottomOf="@+id/edit_text_email"
         app:layout_constraintEnd_toEndOf="parent"

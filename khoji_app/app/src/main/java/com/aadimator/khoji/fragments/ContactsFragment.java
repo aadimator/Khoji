@@ -170,6 +170,11 @@ public class ContactsFragment extends Fragment {
                                 .child(mCurrentUser.getUid())
                                 .child(userSnapshot.getKey())
                                 .setValue(user.getName());
+                        database.getReference()
+                                .child(Constant.FIREBASE_URL_CONTACTS)
+                                .child(userSnapshot.getKey())
+                                .child(mCurrentUser.getUid())
+                                .setValue(mCurrentUser.getDisplayName());
                         Toast.makeText(mContext, getString(R.string.contact_added, email), Toast.LENGTH_SHORT).show();
                     }
                 } else {
