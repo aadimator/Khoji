@@ -8,6 +8,7 @@
 /captures
 .externalNativeBuild
 app/keystore.jks
+app/google-services.json
 app/src/main/res/values/secrets.xml
 gradle.properties
 .idea/

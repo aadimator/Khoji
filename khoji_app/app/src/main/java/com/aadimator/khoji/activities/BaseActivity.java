@@ -20,9 +20,10 @@ public class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
 
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+
         FirebaseAuth auth = FirebaseAuth.getInstance();
 
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
         if (auth.getCurrentUser() != null) {
             // already signed in
