@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.aadimator.khoji.R;
-import com.aadimator.khoji.common.helpers.GlideApp;
+import com.aadimator.khoji.common.GlideApp;
 import com.google.ar.sceneform.Node;
 import com.google.ar.sceneform.rendering.ViewRenderable;
 

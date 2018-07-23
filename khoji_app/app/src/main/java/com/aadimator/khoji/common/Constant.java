@@ -21,4 +21,5 @@ public class Constant {
     public static final String FIREBASE_URL_USERS = "users";
     public static final String FIREBASE_URL_LOCATIONS = "locations";
     public static final String FIREBASE_URL_CONTACTS = "contacts";
+    public static final String FIREBASE_URL_CHATS = "chat_rooms";
 }

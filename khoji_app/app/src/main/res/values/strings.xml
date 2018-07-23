@@ -24,5 +24,6 @@
     <string name="contact_added">%1$s added to Contacts!</string>
     <string name="email_not_found">No user found with %1$s email.</string>
     <string name="plane_finding">Finding plane...</string>
+    <string name="chat_input_hint">Input</string>
 
 </resources>

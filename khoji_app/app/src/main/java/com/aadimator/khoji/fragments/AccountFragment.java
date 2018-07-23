@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import com.aadimator.khoji.R;
 import com.aadimator.khoji.activities.BaseActivity;
-import com.aadimator.khoji.common.helpers.GlideApp;
+import com.aadimator.khoji.common.GlideApp;
 import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;

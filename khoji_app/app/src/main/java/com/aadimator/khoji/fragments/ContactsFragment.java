@@ -20,7 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aadimator.khoji.R;
-import com.aadimator.khoji.common.helpers.GlideApp;
+import com.aadimator.khoji.common.GlideApp;
 import com.aadimator.khoji.models.User;
 import com.aadimator.khoji.common.Constant;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -36,6 +36,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 
 /**
@@ -49,22 +50,15 @@ import butterknife.ButterKnife;
 public class ContactsFragment extends Fragment {
 
     private final String TAG = ContactsFragment.class.getSimpleName();
-
+    @BindView(R.id.edit_text_email)
+    EditText editTextEmail;
+    @BindView(R.id.recycler_view_contacts)
+    RecyclerView mRecyclerViewContacts;
     private OnFragmentInteractionListener mListener;
     private Context mContext;
     private Activity mActivity;
     private FirebaseUser mCurrentUser;
-
     private FirebaseRecyclerAdapter mRecyclerAdapter;
-
-    @BindView(R.id.edit_text_email)
-    EditText editTextEmail;
-
-    @BindView(R.id.button_add_contact)
-    Button buttonAddContact;
-
-    @BindView(R.id.recycler_view_contacts)
-    RecyclerView mRecyclerViewContacts;
 
     /**
      * Use this factory method to create a new instance of
@@ -74,6 +68,12 @@ public class ContactsFragment extends Fragment {
      */
     public static ContactsFragment newInstance() {
         return new ContactsFragment();
+    }
+
+    @OnClick(R.id.button_add_contact)
+    public void addContactButton(View view) {
+        String email = editTextEmail.getText().toString();
+        addContact(email);
     }
 
     @Override
@@ -88,14 +88,6 @@ public class ContactsFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_contacts, container, false);
         ButterKnife.bind(this, view);
-
-        buttonAddContact.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String email = editTextEmail.getText().toString();
-                addContact(email);
-            }
-        });
 
         mRecyclerAdapter = createRecyclerAdapater();
         mRecyclerViewContacts.setLayoutManager(new LinearLayoutManager(mContext));

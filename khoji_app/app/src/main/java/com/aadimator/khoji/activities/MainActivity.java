@@ -354,7 +354,8 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onContactSelection(String uid) {
-        mSelectedFragment = MapFragment.newInstance(uid);
-        changeFragment();
+//        mSelectedFragment = MapFragment.newInstance(uid);
+//        changeFragment();
+        startActivity(ChatActivity.newIntent(this, uid));
     }
 }
