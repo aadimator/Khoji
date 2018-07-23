@@ -3,7 +3,9 @@ package com.aadimator.khoji.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,12 +16,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.aadimator.khoji.R;
 import com.aadimator.khoji.common.Constant;
+import com.aadimator.khoji.common.GlideApp;
+import com.aadimator.khoji.common.Utilities;
 import com.aadimator.khoji.models.ChatMessage;
 import com.aadimator.khoji.models.User;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -38,6 +43,7 @@ import java.util.Objects;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Optional;
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -46,11 +52,12 @@ public class ChatActivity extends AppCompatActivity {
     public static final String BUNDLE_ROOM_ID = "com.aadimator.khoji.activities.room_id";
     public static final String BUNDLE_CURRENT_USER = "com.aadimator.khoji.activities.current_user";
     public static final String BUNDLE_OTHER_USER_ID = "com.aadimator.khoji.activities.other_user_ID";
-
     @BindView(R.id.edit_text_message)
     EditText mEditTextMessage;
     @BindView(R.id.rv_chat_messages)
     RecyclerView mRecyclerViewMessages;
+    private int MY_MESSAGE = 0;
+    private int THEIR_MESSAGE = 1;
     private String mRoomId = "";
     private String mCurrentUserId = "";
     private String mOtherUserId = "";
@@ -174,18 +181,43 @@ public class ChatActivity extends AppCompatActivity {
         return new FirebaseRecyclerAdapter<ChatMessage, ChatActivity.ChatHolder>(options) {
             @Override
             public ChatActivity.ChatHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.message, parent, false);
+                View view;
+                if (viewType == MY_MESSAGE) {
+                    view = LayoutInflater.from(parent.getContext())
+                            .inflate(R.layout.my_message, parent, false);
+                } else {
+                    view = LayoutInflater.from(parent.getContext())
+                            .inflate(R.layout.their_message, parent, false);
+                }
 
                 return new ChatActivity.ChatHolder(view);
             }
 
             @Override
+            public int getItemViewType(int position) {
+                return getItem(position).getUserId().equals(mCurrentUserId) ? MY_MESSAGE : THEIR_MESSAGE;
+            }
+
+            @Override
             protected void onBindViewHolder(@NonNull ChatActivity.ChatHolder holder, final int position, @NonNull final ChatMessage model) {
-                holder.mTextViewSender.setText(model.getUserName());
-                holder.mTextViewTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)",
-                        model.getTime()));
-                holder.mTextViewMessage.setText(model.getText());
+                if (getItemViewType(position) == MY_MESSAGE) {
+                    holder.mTextViewBody.setText(model.getText());
+                } else {
+                    holder.mTextViewSender.setText(model.getUserName());
+//                    holder.mTextViewTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)",
+//                            model.getTime()));
+                    holder.mTextViewBody.setText(model.getText());
+//                    GradientDrawable drawable = (GradientDrawable) holder.mViewAvatar.getBackground();
+//                    drawable.setColor(Color.parseColor(Utilities.getRandomColor()));
+                    if (mOtherUser != null) {
+                        GlideApp.with(getApplicationContext())
+                                .load(mOtherUser.getPhotoUrl())
+                                .placeholder(R.drawable.user_avatar)
+                                .circleCrop()
+                                .into(holder.mViewAvatar);
+                    }
+                }
+
 //                holder.mRelativeLayoutMessageBox.setBackgroundColor(Color.BLUE);
             }
 
@@ -199,14 +231,19 @@ public class ChatActivity extends AppCompatActivity {
 
     class ChatHolder extends RecyclerView.ViewHolder {
 
+
+        @BindView(R.id.message_avatar)
+        @Nullable
+        ImageView mViewAvatar;
+
         @BindView(R.id.message_sender)
+        @Nullable
         TextView mTextViewSender;
-        @BindView(R.id.message_time)
-        TextView mTextViewTime;
-        @BindView(R.id.message_text)
-        TextView mTextViewMessage;
-        @BindView(R.id.rl_message_box)
-        RelativeLayout mRelativeLayoutMessageBox;
+
+        @BindView(R.id.message_body)
+        TextView mTextViewBody;
+//        @BindView(R.id.rl_message_box)
+//        RelativeLayout mRelativeLayoutMessageBox;
 
         ChatHolder(View itemView) {
             super(itemView);

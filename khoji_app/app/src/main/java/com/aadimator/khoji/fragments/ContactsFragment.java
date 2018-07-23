@@ -121,7 +121,7 @@ public class ContactsFragment extends Fragment {
                 holder.mTextViewName.setText(model.getName());
                 GlideApp.with(mActivity)
                         .load(model.getPhotoUrl())
-                        .placeholder(R.drawable.com_facebook_profile_picture_blank_square)
+                        .placeholder(R.drawable.user_avatar)
                         .circleCrop()
                         .into(holder.mImageViewProfile);
                 holder.mButtonDelete.setOnClickListener(new View.OnClickListener() {
