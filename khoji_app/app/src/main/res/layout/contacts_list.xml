@@ -43,6 +43,20 @@
     </android.support.constraint.ConstraintLayout>
 
     <ImageButton
+        android:id="@+id/buttonMessage"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:background="?attr/selectableItemBackground"
+        android:contentDescription="@string/delete_btn_content_desc"
+        android:tint="@color/colorPrimary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/buttonDelete"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_message_black_24dp" />
+
+    <ImageButton
         android:id="@+id/buttonDelete"
         android:layout_width="50dp"
         android:layout_height="50dp"

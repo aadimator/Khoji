@@ -72,7 +72,9 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     public static String getRoomId(String uid1, String uid2) {
-        return (uid1.compareTo(uid2) > 0) ? uid1 + '_' + uid2 : uid2 + '_' + uid1;
+        return (uid1.compareTo(uid2) > 0) ?
+                uid1 + '_' + uid2 :
+                uid2 + '_' + uid1;
     }
 
     @OnClick(R.id.button_send_message)

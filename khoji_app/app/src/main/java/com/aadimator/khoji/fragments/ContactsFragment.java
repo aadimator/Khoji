@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aadimator.khoji.R;
+import com.aadimator.khoji.activities.ChatActivity;
 import com.aadimator.khoji.common.GlideApp;
 import com.aadimator.khoji.models.User;
 import com.aadimator.khoji.common.Constant;
@@ -108,8 +109,9 @@ public class ContactsFragment extends Fragment {
                         .build();
 
         return new FirebaseRecyclerAdapter<User, UserHolder>(options) {
+            @NonNull
             @Override
-            public UserHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            public UserHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
                 View view = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.contacts_list, parent, false);
 
@@ -124,24 +126,18 @@ public class ContactsFragment extends Fragment {
                         .placeholder(R.drawable.user_avatar)
                         .circleCrop()
                         .into(holder.mImageViewProfile);
-                holder.mButtonDelete.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        String key = mRecyclerAdapter.getRef(position).getKey();
-                        FirebaseDatabase.getInstance()
-                                .getReference(Constant.FIREBASE_URL_CONTACTS)
-                                .child(mCurrentUser.getUid())
-                                .child(key)
-                                .removeValue();
-                    }
+                holder.mButtonDelete.setOnClickListener(view -> {
+                    String key = mRecyclerAdapter.getRef(position).getKey();
+                    FirebaseDatabase.getInstance()
+                            .getReference(Constant.FIREBASE_URL_CONTACTS)
+                            .child(mCurrentUser.getUid())
+                            .child(key)
+                            .removeValue();
                 });
 
-                holder.mContactView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        mListener.onContactSelection(mRecyclerAdapter.getRef(position).getKey());
-                    }
-                });
+                holder.mButtonMessage.setOnClickListener(v -> startActivity(ChatActivity.newIntent(mContext, mRecyclerAdapter.getRef(position).getKey())));
+
+                holder.mContactView.setOnClickListener(view -> mListener.onContactSelection(mRecyclerAdapter.getRef(position).getKey()));
             }
 
             @Override
@@ -242,6 +238,8 @@ public class ContactsFragment extends Fragment {
         ImageView mImageViewProfile;
         @BindView(R.id.textViewName)
         TextView mTextViewName;
+        @BindView(R.id.buttonMessage)
+        ImageButton mButtonMessage;
         @BindView(R.id.buttonDelete)
         ImageButton mButtonDelete;
         @BindView(R.id.contactView)
