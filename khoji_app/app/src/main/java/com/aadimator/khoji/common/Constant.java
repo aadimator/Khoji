@@ -22,4 +22,10 @@ public class Constant {
     public static final String FIREBASE_URL_LOCATIONS = "locations";
     public static final String FIREBASE_URL_CONTACTS = "contacts";
     public static final String FIREBASE_URL_CHATS = "chat_rooms";
+
+    public static final String BOT_UID = "srLmzOo7XQQjvlqyMKkctjLzeMN2";
+
+
+    // DialogeFlow
+    public static final String DIALOGEFLOW_ACCESS_TOKEN = "10a9c95ef8af41c1b76d6f57865b192d";
 }

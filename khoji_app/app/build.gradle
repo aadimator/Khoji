@@ -19,6 +19,7 @@ android {
         applicationId "com.aadimator.khoji"
         minSdkVersion 19
         targetSdkVersion 27
+        multiDexEnabled true
         versionCode 1
         versionName "1.0"
 //        ndk {
@@ -102,6 +103,8 @@ dependencies {
 //    implementation 'de.javagl:obj:1.1.1'
 
     implementation 'com.github.appoly:ARCore-Location:1.1.1'
+
+    implementation 'com.github.kittinunf.fuel:fuel-android:1.12.1'
 }
 
 apply plugin: 'com.google.gms.google-services'

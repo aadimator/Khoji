@@ -12,6 +12,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
 import android.util.Log;
+
+import kotlin.Pair;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +32,13 @@ import com.aadimator.khoji.models.ChatMessage;
 import com.aadimator.khoji.models.User;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.github.kittinunf.fuel.Fuel;
+import com.github.kittinunf.fuel.core.FuelError;
+import com.github.kittinunf.fuel.core.FuelManager;
+import com.github.kittinunf.fuel.core.Handler;
+import com.github.kittinunf.fuel.core.Method;
+import com.github.kittinunf.fuel.core.Request;
+import com.github.kittinunf.fuel.core.Response;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -37,8 +47,18 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,10 +68,10 @@ import butterknife.Optional;
 public class ChatActivity extends AppCompatActivity {
 
     public static final String TAG = ChatActivity.class.getSimpleName();
-
     public static final String BUNDLE_ROOM_ID = "com.aadimator.khoji.activities.room_id";
     public static final String BUNDLE_CURRENT_USER = "com.aadimator.khoji.activities.current_user";
     public static final String BUNDLE_OTHER_USER_ID = "com.aadimator.khoji.activities.other_user_ID";
+
     @BindView(R.id.edit_text_message)
     EditText mEditTextMessage;
     @BindView(R.id.rv_chat_messages)
@@ -64,6 +84,9 @@ public class ChatActivity extends AppCompatActivity {
     private FirebaseUser mCurrentUser;
     private User mOtherUser;
     private FirebaseRecyclerAdapter mRecyclerAdapter;
+    private boolean isBot = false;
+
+    private FuelManager mFuelManager;
 
     public static Intent newIntent(Context context, String other_user_id) {
         Intent intent = new Intent(context, ChatActivity.class);
@@ -92,9 +115,51 @@ public class ChatActivity extends AppCompatActivity {
                             )
                     );
 
+            if (isBot) {
+                getBotResponse(mEditTextMessage.getText().toString());
+            }
+
             // Clear the input
             mEditTextMessage.setText("");
         }
+    }
+
+    private void getBotResponse(String query) {
+        List<Pair<String, String>> params = new ArrayList<>();
+        params.add(new Pair<>("query", query));
+
+        mFuelManager.request(Method.GET, "/query", params).responseString(new Handler<String>() {
+            @Override
+            public void success(Request request, Response response, String s) {
+//                        Log.i(TAG, "Response: " + request.toString());
+//                        Log.i(TAG, "Request: " + response.toString());
+//                        Log.i(TAG, "String: " + s);
+                JsonObject result = new JsonParser().parse(s).getAsJsonObject();
+                JsonArray messages = result.getAsJsonObject("result")
+                        .getAsJsonObject("fulfillment")
+                        .getAsJsonArray("messages");
+                for (JsonElement element : messages) {
+                    String message = element.getAsJsonObject().get("speech").getAsString();
+                    Log.i(TAG, "Message #" + message);
+                    FirebaseDatabase.getInstance()
+                            .getReference(Constant.FIREBASE_URL_CHATS)
+                            .child(mRoomId)
+                            .push()
+                            .setValue(
+                                    new ChatMessage(
+                                            message,
+                                            Constant.BOT_UID,
+                                            mOtherUser.getName()
+                                    )
+                            );
+                }
+            }
+
+            @Override
+            public void failure(Request request, Response response, FuelError fuelError) {
+                Log.d(TAG, "Error getting bot response." + fuelError.toString());
+            }
+        });
     }
 
     @Override
@@ -103,6 +168,7 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         ButterKnife.bind(this);
+
 
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
         assert mCurrentUser != null;
@@ -114,6 +180,11 @@ public class ChatActivity extends AppCompatActivity {
 
         mRoomId = getRoomId(mCurrentUserId, mOtherUserId);
         Log.i(TAG, "Room id: " + mRoomId);
+
+        if (mOtherUserId.equals(Constant.BOT_UID)) {
+            isBot = true;
+            setBotAPI();
+        }
 
         getOtherUser();
 
@@ -134,6 +205,22 @@ public class ChatActivity extends AppCompatActivity {
         });
         mRecyclerViewMessages.setLayoutManager(linearLayoutManager);
         mRecyclerViewMessages.setAdapter(mRecyclerAdapter);
+    }
+
+    private void setBotAPI() {
+        mFuelManager = new FuelManager();
+        Map<String, String> baseHeader = new HashMap<>();
+        baseHeader.put("Authorization", "Bearer " + Constant.DIALOGEFLOW_ACCESS_TOKEN);
+        mFuelManager.setBaseHeaders(baseHeader);
+
+        mFuelManager.setBasePath("https://api.dialogflow.com/v1/");
+        Log.d(TAG, "FuelManager Base Path : " + mFuelManager.getBasePath());
+
+        List<Pair<String, String>> baseParams = new ArrayList<>();
+        baseParams.add(new Pair<>("v", "20150910"));
+        baseParams.add(new Pair<>("sessionId", UUID.randomUUID().toString()));
+        baseParams.add(new Pair<>("lang", "en"));
+        mFuelManager.setBaseParams(baseParams);
     }
 
     @Override
