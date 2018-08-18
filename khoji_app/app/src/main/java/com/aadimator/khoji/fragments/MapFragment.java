@@ -7,16 +7,23 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aadimator.khoji.R;
 import com.aadimator.khoji.activities.ArActivity;
+import com.aadimator.khoji.activities.ChatActivity;
+import com.aadimator.khoji.common.GlideApp;
 import com.aadimator.khoji.models.User;
 import com.aadimator.khoji.models.UserLocation;
 import com.aadimator.khoji.models.UserMarker;
@@ -37,6 +44,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -59,8 +67,48 @@ public class MapFragment extends Fragment implements
 
     private static final String ARG_UID = "uid";
     private final String TAG = MapFragment.class.getSimpleName();
+
     @BindView(R.id.locateInARButton)
     FloatingActionButton mArButton;
+
+    @BindView(R.id.bs_user_info)
+    LinearLayout mLayoutBottomSheet;
+
+    @BindView(R.id.bs_user_name)
+    TextView mTextViewUserName;
+
+    @BindView(R.id.bs_user_update_time)
+    TextView mTextViewUserUpdateTime;
+
+    @BindView(R.id.bs_user_avatar)
+    ImageView mImageViewUserAvatar;
+
+    @OnClick(R.id.btn_showInAR)
+    public void showInAr(View view) {
+        if (!mArAvailable) {
+            Toast.makeText(getContext(), "AR feature is not available.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (!mSelectedUserMarker.getUserID().equals(mCurrentUser.getUid())) {
+            HashMap<String, UserMarker> hashMap = new HashMap<>();
+            hashMap.put(mSelectedUserMarker.getUserID(), mSelectedUserMarker);
+            startActivity(ArActivity.newIntent(getContext(), hashMap));
+        } else {
+            Toast.makeText(getContext(), "Cannot view yourself in AR.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @OnClick(R.id.btn_sendMessage)
+    public void sendMessage(View view) {
+        if (!mSelectedUserMarker.getUserID().equals(mCurrentUser.getUid())) {
+            startActivity(ChatActivity.newIntent(getContext(), mSelectedUserMarker.getUserID()));
+        } else {
+            Toast.makeText(getContext(), "Cannot send messages to yourself", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    BottomSheetBehavior mSheetBehavior;
+
     private Activity mActivity;
     /**
      * The listener implemented by the Activity for communication with fragment.
@@ -94,6 +142,8 @@ public class MapFragment extends Fragment implements
      * Represents the position of the current user.
      */
     private Marker mCurrentUserMarker;
+
+    private UserMarker mSelectedUserMarker;
     /**
      * Stores the markers of all the contacts
      */
@@ -208,6 +258,40 @@ public class MapFragment extends Fragment implements
 
         maybeEnableArButton();
 
+        mSheetBehavior = BottomSheetBehavior.from(mLayoutBottomSheet);
+        mSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+
+        /**
+         * bottom sheet state change listener
+         * we are changing button text when sheet changed state
+         * */
+        mSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                switch (newState) {
+                    case BottomSheetBehavior.STATE_HIDDEN:
+                        break;
+                    case BottomSheetBehavior.STATE_EXPANDED: {
+//                        btnBottomSheet.setText("Close Sheet");
+                    }
+                    break;
+                    case BottomSheetBehavior.STATE_COLLAPSED: {
+//                        btnBottomSheet.setText("Expand Sheet");
+                    }
+                    break;
+                    case BottomSheetBehavior.STATE_DRAGGING:
+                        break;
+                    case BottomSheetBehavior.STATE_SETTLING:
+                        break;
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
+            }
+        });
+
         return view;
     }
 
@@ -241,16 +325,40 @@ public class MapFragment extends Fragment implements
     public void onMapReady(GoogleMap googleMap) {
         mMapReady = true;
         mGoogleMap = googleMap;
-//        mGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-//            @Override
-//            public boolean onMarkerClick(Marker marker) {
-//                Log.d(TAG, "Marker clicked: " + marker.getTitle());
+        mGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                Log.d(TAG, "Marker clicked: " + marker.getTitle());
 //                mUserMarkers = getUserMarkers();
 //                startActivity(ArActivity.newIntent(mActivity, mUserMarkers));
-//                return false;
-//            }
-//        });
+                UserMarker userMarker = (UserMarker) marker.getTag();
+                assert userMarker != null;
+                mSelectedUserMarker = userMarker;
+                updateBottomSheet();
+                if (mSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
+                    mSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                }
+//                } else {
+//                    mSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+//                }
+                return true;
+            }
+        });
         updateMap();
+    }
+
+    private void updateBottomSheet() {
+        mTextViewUserName.setText(mSelectedUserMarker.getUser().getName());
+        DateFormat timeFormat = android.text.format.DateFormat.getTimeFormat(getContext());
+        DateFormat dateFormat = android.text.format.DateFormat.getLongDateFormat(getContext());
+        Long time = mSelectedUserMarker.getUserLocation().getTime();
+        mTextViewUserUpdateTime.setText(String.format("%s %s", dateFormat.format(time), timeFormat.format(time)));
+        GlideApp.with(this)
+                .load(mSelectedUserMarker.getUser().getPhotoUrl())
+                .placeholder(R.drawable.user_avatar)
+                .circleCrop()
+                .skipMemoryCache(true)
+                .into(mImageViewUserAvatar);
     }
 
     private HashMap<String, UserMarker> getUserMarkers() {
@@ -314,6 +422,16 @@ public class MapFragment extends Fragment implements
                                     .defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
                     );
             mCurrentUserMarker.showInfoWindow();
+            mCurrentUserMarker.setTag(
+                    new UserMarker(
+                            mCurrentUser.getUid(),
+                            new User(
+                                    mCurrentUser.getDisplayName(),
+                                    mCurrentUser.getEmail(),
+                                    ""
+                            ),
+                            mCurrentLocation)
+            );
         } else {
             mCurrentUserMarker.setPosition(latLng);
         }
@@ -334,6 +452,7 @@ public class MapFragment extends Fragment implements
                 Marker marker = mGoogleMap.addMarker(new MarkerOptions()
                         .position(latLng)
                         .title(user.getName()));
+                marker.setTag(new UserMarker(entry.getKey(), user, location));
                 mContactsMarkers.put(entry.getKey(), marker);
             }
         }

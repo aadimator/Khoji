@@ -21,7 +21,15 @@
         android:focusable="true"
         app:elevation="4dp"
         app:layout_anchorGravity="bottom|right|end"
-        app:srcCompat="@android:drawable/ic_menu_search" />
+        app:srcCompat="@drawable/ic_vr_glasses" />
+
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include layout="@layout/bottom_sheet_user_info" />
+
+    </android.support.design.widget.CoordinatorLayout>
 
 </FrameLayout>
 

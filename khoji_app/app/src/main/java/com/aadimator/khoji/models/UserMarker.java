@@ -39,6 +39,7 @@ public class UserMarker implements Parcelable {
     private static final String TAG = UserMarker.class.getSimpleName();
     private User mUser;
     private UserLocation mUserLocation;
+    private String mUserID;
     private float mDistance;
     private boolean mInRange;
 
@@ -47,9 +48,16 @@ public class UserMarker implements Parcelable {
         mUserLocation = userLocation;
     }
 
+    public UserMarker(String userID, User user, UserLocation userLocation) {
+        mUserID = userID;
+        mUser = user;
+        mUserLocation = userLocation;
+    }
+
     protected UserMarker(Parcel in) {
         this.mUser = in.readParcelable(User.class.getClassLoader());
         this.mUserLocation = in.readParcelable(UserLocation.class.getClassLoader());
+        this.mUserID = in.readString();
         this.mDistance = in.readFloat();
         this.mInRange = in.readByte() != 0;
     }
@@ -124,6 +132,14 @@ public class UserMarker implements Parcelable {
         return markerDistance > limit;
     }
 
+    public String getUserID() {
+        return mUserID;
+    }
+
+    public void setUserID(String userID) {
+        mUserID = userID;
+    }
+
     public User getUser() {
         return mUser;
     }
@@ -165,6 +181,7 @@ public class UserMarker implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeParcelable(this.mUser, flags);
         dest.writeParcelable(this.mUserLocation, flags);
+        dest.writeString(this.mUserID);
         dest.writeFloat(this.mDistance);
         dest.writeByte(this.mInRange ? (byte) 1 : (byte) 0);
     }
