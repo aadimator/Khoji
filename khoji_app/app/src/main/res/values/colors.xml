@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3f51b5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#ff4081</color>
+    <color name="colorPrimary">@color/flatDarkGrey</color>
+    <color name="colorPrimaryDark">@color/flatDarkGrey</color>
+    <color name="colorAccent">@color/flatRed</color>
 
     <color name="colorSecondary">#FFC107</color>
+
+    <color name="textPrimary">@color/flatHalfWhite</color>
+
+    <color name="flatDarkGrey">#2C3E50</color>
+    <color name="flatHalfWhite">#ecf0f1</color>
+    <color name="flatRed">#E74C3C</color>
+    <color name="flatBlue">#3498DB</color>
+
 </resources>

@@ -25,5 +25,8 @@
     <string name="email_not_found">No user found with %1$s email.</string>
     <string name="plane_finding">Finding plane...</string>
     <string name="chat_input_hint">Input</string>
+    <string name="btn_showInAR_cd">Show in AR</string>
+    <string name="btn_send_message_cd">Send Message</string>
+    <string name="bs_last_updated_time">Last Updated on</string>
 
 </resources>
