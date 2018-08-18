@@ -93,7 +93,7 @@ public class UserMarker implements Parcelable {
 
                                 GlideApp.with(c)
                                         .load(mUser.getPhotoUrl())
-                                        .placeholder(R.drawable.com_facebook_profile_picture_blank_square)
+                                        .placeholder(R.drawable.user_avatar)
                                         .circleCrop()
                                         .into(imageView);
 

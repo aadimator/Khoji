@@ -27,6 +27,7 @@ import com.aadimator.khoji.common.GlideApp;
 import com.aadimator.khoji.models.User;
 import com.aadimator.khoji.models.UserLocation;
 import com.aadimator.khoji.models.UserMarker;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -365,7 +366,6 @@ public class MapFragment extends Fragment implements
                 .load(mSelectedUserMarker.getUser().getPhotoUrl())
                 .placeholder(R.drawable.user_avatar)
                 .circleCrop()
-                .skipMemoryCache(true)
                 .into(mImageViewUserAvatar);
     }
 

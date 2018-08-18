@@ -25,6 +25,7 @@ import com.aadimator.khoji.common.GlideApp;
 import com.aadimator.khoji.models.User;
 import com.aadimator.khoji.common.Constant;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -126,7 +127,6 @@ public class ContactsFragment extends Fragment {
                         .load(model.getPhotoUrl())
                         .placeholder(R.drawable.user_avatar)
                         .circleCrop()
-                        .skipMemoryCache(true)
                         .into(holder.mImageViewProfile);
                 holder.mButtonDelete.setOnClickListener(view -> {
                     String key = mRecyclerAdapter.getRef(position).getKey();
