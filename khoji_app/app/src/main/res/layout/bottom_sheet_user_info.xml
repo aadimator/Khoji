@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bs_user_info"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorPrimary"
+    android:orientation="vertical"
+    android:padding="@dimen/activity_vertical_margin"
+    app:behavior_hideable="true"
+    app:behavior_peekHeight="56dp"
+    app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:orientation="horizontal"
+        android:weightSum="4">
+
+        <TextView
+            android:id="@+id/bs_user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:textColor="@color/flatHalfWhite"
+            android:layout_weight="3"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            tools:text="Dr.Shafqat Mehmood" />
+
+        <ImageView
+            android:id="@+id/bs_user_avatar"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="end"
+            android:layout_weight="1"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:tint="@color/flatHalfWhite"
+            app:srcCompat="@drawable/user_avatar" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:orientation="horizontal"
+        android:weightSum="3">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_weight="1.5"
+            android:text="@string/bs_last_updated_time"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@color/textPrimary" />
+
+        <TextView
+            android:id="@+id/bs_user_update_time"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.5"
+            android:gravity="end"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="@color/textPrimary"
+            tools:text="Fri, 23, 2018 12:23:12" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <ImageButton
+            android:id="@+id/btn_showInAR"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:layout_weight="1"
+            android:background="@color/flatBlue"
+            android:contentDescription="@string/btn_showInAR_cd"
+            android:tint="@color/flatHalfWhite"
+            app:srcCompat="@drawable/ic_vr_glasses" />
+
+        <ImageButton
+            android:id="@+id/btn_sendMessage"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:layout_weight="1"
+            android:background="@color/flatBlue"
+            android:contentDescription="@string/btn_send_message_cd"
+            android:tint="@color/flatHalfWhite"
+            app:srcCompat="@drawable/ic_message_black_24dp" />
+    </LinearLayout>
+
+
+</LinearLayout>
