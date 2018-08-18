@@ -7,15 +7,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.BottomSheetDialog;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -24,11 +22,11 @@ import android.widget.Toast;
 import com.aadimator.khoji.R;
 import com.aadimator.khoji.activities.ArActivity;
 import com.aadimator.khoji.activities.ChatActivity;
+import com.aadimator.khoji.common.Constant;
 import com.aadimator.khoji.common.GlideApp;
 import com.aadimator.khoji.models.User;
 import com.aadimator.khoji.models.UserLocation;
 import com.aadimator.khoji.models.UserMarker;
-import com.aadimator.khoji.common.Constant;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -92,9 +90,9 @@ public class MapFragment extends Fragment implements
             return;
         }
         if (!mSelectedUserMarker.getUserID().equals(mCurrentUser.getUid())) {
-            HashMap<String, UserMarker> hashMap = new HashMap<>();
-            hashMap.put(mSelectedUserMarker.getUserID(), mSelectedUserMarker);
-            startActivity(ArActivity.newIntent(getContext(), hashMap));
+            ArrayList<UserMarker> userMarker = new ArrayList<>();
+            userMarker.add(mSelectedUserMarker);
+            startActivity(ArActivity.newIntent(getContext(), userMarker));
         } else {
             Toast.makeText(getContext(), "Cannot view yourself in AR.", Toast.LENGTH_SHORT).show();
         }
@@ -150,7 +148,7 @@ public class MapFragment extends Fragment implements
      * Stores the markers of all the contacts
      */
     private HashMap<String, Marker> mContactsMarkers;
-    private HashMap<String, UserMarker> mUserMarkers;
+    private ArrayList<UserMarker> mUserMarkers;
     /**
      * If the camera view has been updated to the user's current location.
      * Should only position once automatically.
@@ -242,7 +240,7 @@ public class MapFragment extends Fragment implements
         mContacts = new HashMap<>();
         mContactsLocations = new HashMap<>();
         mContactsMarkers = new HashMap<>();
-        mUserMarkers = new HashMap<>();
+        mUserMarkers = new ArrayList<>();
 
         // Get current's user's location from Firebase DB
         getCurrentLocation();
@@ -263,10 +261,6 @@ public class MapFragment extends Fragment implements
         mSheetBehavior = BottomSheetBehavior.from(mLayoutBottomSheet);
         mSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
-        /**
-         * bottom sheet state change listener
-         * we are changing button text when sheet changed state
-         * */
         mSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
@@ -342,24 +336,21 @@ public class MapFragment extends Fragment implements
             Log.e(TAG, "Can't find style. Error: ", e);
         }
 
-        mGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                Log.d(TAG, "Marker clicked: " + marker.getTitle());
+        mGoogleMap.setOnMarkerClickListener(marker -> {
+            Log.d(TAG, "Marker clicked: " + marker.getTitle());
 //                mUserMarkers = getUserMarkers();
 //                startActivity(ArActivity.newIntent(mActivity, mUserMarkers));
-                UserMarker userMarker = (UserMarker) marker.getTag();
-                assert userMarker != null;
-                mSelectedUserMarker = userMarker;
-                updateBottomSheet();
-                if (mSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
-                    mSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                }
+            UserMarker userMarker = (UserMarker) marker.getTag();
+            assert userMarker != null;
+            mSelectedUserMarker = userMarker;
+            updateBottomSheet();
+            if (mSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
+                mSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            }
 //                } else {
 //                    mSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 //                }
-                return true;
-            }
+            return true;
         });
         updateMap();
     }
@@ -378,11 +369,10 @@ public class MapFragment extends Fragment implements
                 .into(mImageViewUserAvatar);
     }
 
-    private HashMap<String, UserMarker> getUserMarkers() {
-        HashMap<String, UserMarker> userMarkers = new HashMap<>();
+    private ArrayList<UserMarker> getUserMarkers() {
+        ArrayList<UserMarker> userMarkers = new ArrayList<>();
         for (String key : mContacts.keySet()) {
-            userMarkers.put(key, new UserMarker(mContacts.get(key), mContactsLocations.get(key)));
-
+            userMarkers.add(new UserMarker(key, mContacts.get(key), mContactsLocations.get(key)));
         }
         return userMarkers;
     }
@@ -445,7 +435,7 @@ public class MapFragment extends Fragment implements
                             new User(
                                     mCurrentUser.getDisplayName(),
                                     mCurrentUser.getEmail(),
-                                    ""
+                                    mCurrentUser.getPhotoUrl().toString()
                             ),
                             mCurrentLocation)
             );

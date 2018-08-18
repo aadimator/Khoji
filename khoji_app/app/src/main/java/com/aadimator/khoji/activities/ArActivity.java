@@ -66,12 +66,12 @@ public class ArActivity extends AppCompatActivity {
     private ViewRenderable exampleLayoutRenderable;
     // Our ARCore-Location scene
     private LocationScene locationScene;
-    private HashMap<String, UserMarker> mMarkerList;
+    private ArrayList<UserMarker> mMarkerList;
     private ArrayList<String> mContactIds = new ArrayList<>();
 
 
     public static Intent newIntent(Context packageContext,
-                                   HashMap<String, UserMarker> userMarkers) {
+                                   ArrayList<UserMarker> userMarkers) {
         Intent intent = new Intent(packageContext, ArActivity.class);
         intent.putExtra(BUNDLE_MARKERS_LIST, userMarkers);
         return intent;
@@ -86,10 +86,10 @@ public class ArActivity extends AppCompatActivity {
         setContentView(R.layout.activity_ar);
         arSceneView = findViewById(R.id.ar_scene_view);
 
-        mMarkerList = new HashMap<>();
+        mMarkerList = new ArrayList<>();
         if (Objects.requireNonNull(getIntent().getExtras())
                 .get(BUNDLE_MARKERS_LIST) != null) {
-            mMarkerList = (HashMap<String, UserMarker>) getIntent()
+            mMarkerList = (ArrayList<UserMarker>) getIntent()
                     .getExtras().getSerializable(BUNDLE_MARKERS_LIST);
         }
 
@@ -156,10 +156,9 @@ public class ArActivity extends AppCompatActivity {
                                 locationScene.setOffsetOverlapping(true);
 
                                 // Now lets create our location markers.
-                                for (Map.Entry<String, UserMarker> entry : mMarkerList.entrySet()) {
-                                    UserMarker marker = entry.getValue();
+                                for (UserMarker marker : mMarkerList) {
                                     marker.render(this, locationScene);
-                                    mContactIds.add(marker.getUser().getEmail());
+                                    mContactIds.add(marker.getUserID());
                                 }
                             }
 
@@ -193,7 +192,8 @@ public class ArActivity extends AppCompatActivity {
     }
 
     private void listenForUpdates() {
-        for (final String key : mMarkerList.keySet()) {
+        for (UserMarker marker : mMarkerList) {
+            String key = marker.getUserID();
             FirebaseDatabase.getInstance()
                     .getReference(Constant.FIREBASE_URL_LOCATIONS)
                     .child(key)
@@ -204,13 +204,13 @@ public class ArActivity extends AppCompatActivity {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     UserLocation location = dataSnapshot.getValue(UserLocation.class);
-                                    UserMarker userMarker = mMarkerList.get(key);
+                                    UserMarker userMarker = mMarkerList.get(mMarkerList.indexOf(marker));
                                     // if location changed by 1 meter.
                                     if (userMarker.locationChangedBy(location, 1)) {
                                         userMarker.setUserLocation(location);
-                                        mMarkerList.put(key, userMarker);
+                                        mMarkerList.set(mMarkerList.indexOf(marker), userMarker);
                                         if (!mContactIds.isEmpty() && locationScene != null && !locationScene.mLocationMarkers.isEmpty()) {
-                                            int markerIndex = mContactIds.indexOf(userMarker.getUser().getEmail());
+                                            int markerIndex = mContactIds.indexOf(userMarker.getUserID());
                                             if (markerIndex == -1 || markerIndex >= locationScene.mLocationMarkers.size())
                                                 return;
                                             locationScene.mLocationMarkers.get(markerIndex).anchorNode.getAnchor().detach();
@@ -222,7 +222,7 @@ public class ArActivity extends AppCompatActivity {
 
                                             // Remove the current user from ContactIds so indexes don't clash
                                             mContactIds.remove(markerIndex);
-                                            mContactIds.add(userMarker.getUser().getEmail());
+                                            mContactIds.add(userMarker.getUserID());
 //                                        locationScene.refreshAnchors();
                                         }
                                     }
