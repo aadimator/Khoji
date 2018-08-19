@@ -5,7 +5,8 @@
     android:id="@+id/contactView"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@color/colorPrimary"
+    android:background="@drawable/annotation"
+    android:backgroundTint="@color/colorPrimary"
     app:layout_constraintEnd_toStartOf="@+id/buttonDelete"
     app:layout_constraintStart_toStartOf="parent">
 
@@ -15,12 +16,13 @@
         android:layout_height="80dp"
         android:layout_margin="8dp"
         android:layout_weight="1"
+        android:backgroundTint="@color/flatHalfWhite"
         android:contentDescription="@string/profile_picture_content_description"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/linearLayout2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/com_facebook_profile_picture_blank_square" />
+        app:srcCompat="@drawable/user_avatar" />
 
     <LinearLayout
         android:id="@+id/linearLayout2"
@@ -65,20 +67,14 @@
             android:textColor="@color/colorAccent"
             android:textSize="20sp"
             android:textStyle="bold"
-            tools:text="32 M" />
+            tools:text="32 Meters" />
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
 
-    <!--app:layout_constraintBottom_toBottomOf="@+id/nodeName"-->
-    <!--app:layout_constraintEnd_toEndOf="parent"-->
-    <!--app:layout_constraintStart_toEndOf="@+id/nodeName"-->
-    <!--app:layout_constraintTop_toTopOf="@+id/nodeName"-->
+    <!--app:layout_constraintBottom_toBottomOf="@+id/nodeName"--><!--app:layout_constraintEnd_toEndOf="parent"--><!--app:layout_constraintStart_toEndOf="@+id/nodeName"--><!--app:layout_constraintTop_toTopOf="@+id/nodeName"-->
 
-    <!--app:layout_constraintBottom_toBottomOf="@+id/nodeImage"-->
-    <!--app:layout_constraintEnd_toStartOf="@+id/nodeDistance"-->
-    <!--app:layout_constraintStart_toEndOf="@+id/nodeImage"-->
-    <!--app:layout_constraintTop_toTopOf="@+id/nodeImage"-->
+    <!--app:layout_constraintBottom_toBottomOf="@+id/nodeImage"--><!--app:layout_constraintEnd_toStartOf="@+id/nodeDistance"--><!--app:layout_constraintStart_toEndOf="@+id/nodeImage"--><!--app:layout_constraintTop_toTopOf="@+id/nodeImage"-->
 
     <!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"--><!--xmlns:tools="http://schemas.android.com/tools"--><!--android:layout_width="wrap_content"--><!--android:layout_height="wrap_content"--><!--android:alpha="0.93"--><!--android:background="#a70a04"--><!--android:orientation="vertical"--><!--android:padding="30dp">-->
 

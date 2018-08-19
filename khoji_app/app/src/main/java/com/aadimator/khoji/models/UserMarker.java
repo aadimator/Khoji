@@ -108,7 +108,7 @@ public class UserMarker implements Parcelable {
                                     public void render(LocationNode locationNode) {
                                         View eView = vr.getView();
                                         TextView distanceTextView = eView.findViewById(R.id.nodeDistance);
-                                        distanceTextView.setText(locationNode.getDistance() + "M");
+                                        distanceTextView.setText(locationNode.getDistance() + "Meters");
                                     }
                                 });
 
