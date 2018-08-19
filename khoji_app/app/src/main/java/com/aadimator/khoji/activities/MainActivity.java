@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -36,6 +37,7 @@ import com.firebase.jobdispatcher.RetryStrategy;
 import com.firebase.jobdispatcher.Trigger;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
@@ -63,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements
      * Provides access to the Location Settings API.
      */
     private SettingsClient mSettingsClient;
+
 
     /**
      * Stores the types of location services the client is interested in using. Used for checking
@@ -140,6 +143,7 @@ public class MainActivity extends AppCompatActivity implements
                 .commit();
     }
 
+    @SuppressLint("MissingPermission")
     private void startLocationUpdates() {
         if (locationPermissionGiven()) {
             buildLocationSettingsRequest();

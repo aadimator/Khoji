@@ -28,6 +28,7 @@ public class BaseActivity extends AppCompatActivity {
         if (auth.getCurrentUser() != null) {
             // already signed in
             updateDB(auth.getCurrentUser());
+            addBotContact(auth.getCurrentUser());
             startActivity(MainActivity.newIntent(this, auth.getUid()));
             finish();
         } else {
@@ -41,6 +42,16 @@ public class BaseActivity extends AppCompatActivity {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference users = database.getReference(Constant.FIREBASE_URL_USERS);
         users.child(user.getUid()).setValue(new User(user));
+    }
+
+    private void addBotContact(FirebaseUser user) {
+        DatabaseReference contacts = FirebaseDatabase.getInstance().getReference(Constant.FIREBASE_URL_CONTACTS);
+        contacts.child(user.getUid())
+                .child(Constant.BOT_UID)
+                .setValue(Constant.BOT_NAME);
+        contacts.child(Constant.BOT_UID)
+                .child(user.getUid())
+                .setValue(user.getDisplayName());
     }
 
 }

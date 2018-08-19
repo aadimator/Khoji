@@ -1,16 +1,21 @@
 package com.aadimator.khoji.fragments;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,6 +36,8 @@ import com.aadimator.khoji.models.User;
 import com.aadimator.khoji.models.UserLocation;
 import com.aadimator.khoji.models.UserMarker;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -40,11 +47,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.ar.core.ArCoreApk;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
@@ -52,6 +61,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -162,6 +172,9 @@ public class MapFragment extends Fragment implements
      * If the user is requesting the location updates or not.
      */
     private boolean mRequestingLocationUpdates = true;
+
+    private FusedLocationProviderClient mFusedLocationClient;
+
     private String mCameraFocusUid;
     private float mZoomLevel = 15.0f;
     private boolean mArAvailable = false;
@@ -246,8 +259,12 @@ public class MapFragment extends Fragment implements
         mContactsMarkers = new HashMap<>();
         mUserMarkers = new ArrayList<>();
 
-        // Get current's user's location from Firebase DB
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(mActivity);
+
+        // Get current user's location using last known location
         getCurrentLocation();
+
+        startListeningForCurrentUserLocationUpdates();
 
         // Get the location and info of the User's contacts
         getContactsInfo();
@@ -446,7 +463,7 @@ public class MapFragment extends Fragment implements
                             new User(
                                     mCurrentUser.getDisplayName(),
                                     mCurrentUser.getEmail(),
-                                    mCurrentUser.getPhotoUrl().toString()
+                                    mCurrentUser.getPhotoUrl() == null ? "" : mCurrentUser.getPhotoUrl().toString()
                             ),
                             mCurrentLocation)
             );
@@ -506,7 +523,28 @@ public class MapFragment extends Fragment implements
     /**
      * Retrieve the Logged In User's current location from the Firebase DB
      */
+    @SuppressLint("MissingPermission")
     private void getCurrentLocation() {
+        if (locationPermissionGiven()) {
+            mFusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(mActivity, location -> {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            // Logic to handle location object
+                            mCurrentLocation = new UserLocation(location);
+
+                            // Store the latest location in the FireBase DB
+                            FirebaseDatabase database = FirebaseDatabase.getInstance();
+                            DatabaseReference locations = database.getReference(Constant.FIREBASE_URL_LOCATIONS);
+                            locations.child(mCurrentUser.getUid()).setValue(new UserLocation(location));
+
+                            updateMap();
+                        }
+                    });
+        }
+    }
+
+    private void startListeningForCurrentUserLocationUpdates() {
         FirebaseDatabase.getInstance()
                 .getReference(Constant.FIREBASE_URL_LOCATIONS)
                 .child(mCurrentUser.getUid())
@@ -514,8 +552,12 @@ public class MapFragment extends Fragment implements
                         new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
-                                mCurrentLocation = dataSnapshot.getValue(UserLocation.class);
-                                updateMap();
+                                UserLocation location = dataSnapshot.getValue(UserLocation.class);
+                                assert location != null;
+                                if (mCurrentLocation != null && location.getTime() > mCurrentLocation.getTime()) {
+                                    mCurrentLocation = location;
+                                    updateMap();
+                                }
                             }
 
                             @Override
@@ -580,6 +622,11 @@ public class MapFragment extends Fragment implements
         }
     }
 
+    private boolean locationPermissionGiven() {
+        int permissionState = ActivityCompat.checkSelfPermission(mActivity,
+                Manifest.permission.ACCESS_FINE_LOCATION);
+        return permissionState == PackageManager.PERMISSION_GRANTED;
+    }
 
     /**
      * This interface must be implemented by activities that contain this

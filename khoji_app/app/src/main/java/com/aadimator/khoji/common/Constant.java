@@ -23,7 +23,8 @@ public class Constant {
     public static final String FIREBASE_URL_CONTACTS = "contacts";
     public static final String FIREBASE_URL_CHATS = "chat_rooms";
 
-    public static final String BOT_UID = "srLmzOo7XQQjvlqyMKkctjLzeMN2";
+    public static final String BOT_UID = "y9gK7wa2EBSO96aH6mTEnoOHCps2";
+    public static final String BOT_NAME = "Khoji";
 
 
     // DialogeFlow
