@@ -1,6 +1,8 @@
 package com.aadimator.khoji.models;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -12,6 +14,7 @@ import android.widget.TextView;
 
 import com.aadimator.khoji.R;
 import com.aadimator.khoji.common.GlideApp;
+import com.aadimator.khoji.common.Utilities;
 import com.google.ar.sceneform.Node;
 import com.google.ar.sceneform.rendering.ViewRenderable;
 
@@ -90,10 +93,18 @@ public class UserMarker implements Parcelable {
                                 title.setText(mUser.getName());
 
                                 ImageView imageView = vr.getView().findViewById(R.id.nodeImage);
+//                                imageView.setColorFilter(null);
+
+                                Drawable placeholder = Utilities.getTinted
+                                        (
+                                                c,
+                                                R.drawable.user_avatar,
+                                                c.getResources().getColor(R.color.flatHalfWhite)
+                                        );
 
                                 GlideApp.with(c)
                                         .load(mUser.getPhotoUrl())
-                                        .placeholder(R.drawable.user_avatar)
+                                        .placeholder(placeholder)
                                         .circleCrop()
                                         .into(imageView);
 
@@ -108,7 +119,10 @@ public class UserMarker implements Parcelable {
                                     public void render(LocationNode locationNode) {
                                         View eView = vr.getView();
                                         TextView distanceTextView = eView.findViewById(R.id.nodeDistance);
-                                        distanceTextView.setText(locationNode.getDistance() + "Meters");
+                                        String distance = locationNode.getDistance() > 1000
+                                                ? (locationNode.getDistance() * 0.001) + " km"
+                                                : locationNode.getDistance() + " meters";
+                                        distanceTextView.setText(distance);
                                     }
                                 });
 
@@ -121,6 +135,7 @@ public class UserMarker implements Parcelable {
                             return null;
                         });
     }
+
 
     public boolean locationChanged(UserLocation newLocation) {
         return mUserLocation.getLongitude() != newLocation.getLongitude() ||

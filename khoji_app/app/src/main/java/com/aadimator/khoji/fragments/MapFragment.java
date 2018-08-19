@@ -3,6 +3,8 @@ package com.aadimator.khoji.fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -24,6 +26,7 @@ import com.aadimator.khoji.activities.ArActivity;
 import com.aadimator.khoji.activities.ChatActivity;
 import com.aadimator.khoji.common.Constant;
 import com.aadimator.khoji.common.GlideApp;
+import com.aadimator.khoji.common.Utilities;
 import com.aadimator.khoji.models.User;
 import com.aadimator.khoji.models.UserLocation;
 import com.aadimator.khoji.models.UserMarker;
@@ -362,9 +365,17 @@ public class MapFragment extends Fragment implements
         DateFormat dateFormat = android.text.format.DateFormat.getLongDateFormat(getContext());
         Long time = mSelectedUserMarker.getUserLocation().getTime();
         mTextViewUserUpdateTime.setText(String.format("%s %s", dateFormat.format(time), timeFormat.format(time)));
+
+        Drawable placeholder = Utilities.getTinted
+                (
+                        mActivity,
+                        R.drawable.user_avatar,
+                        mActivity.getResources().getColor(R.color.flatHalfWhite)
+                );
+
         GlideApp.with(this)
                 .load(mSelectedUserMarker.getUser().getPhotoUrl())
-                .placeholder(R.drawable.user_avatar)
+                .placeholder(placeholder)
                 .circleCrop()
                 .into(mImageViewUserAvatar);
     }
