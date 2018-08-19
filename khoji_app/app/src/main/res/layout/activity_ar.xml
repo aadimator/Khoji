@@ -12,10 +12,21 @@
     android:layout_height="match_parent"
     tools:context=".activities.ArActivity">
 
-    <com.google.ar.sceneform.ArSceneView
-        android:id="@+id/ar_scene_view"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_gravity="top" />
+
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true">
+
+        <com.google.ar.sceneform.ArSceneView
+            android:id="@+id/ar_scene_view"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_gravity="top" />
+
+        <include layout="@layout/bottom_sheet_user_info" />
+
+    </android.support.design.widget.CoordinatorLayout>
 
 </RelativeLayout>

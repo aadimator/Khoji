@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements
     /**
      * The desired interval for location updates. Inexact. Updates may be more or less frequent.
      */
-    private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
+    private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 900000; // 15 min
 
     /**
      * Provides access to the Location Settings API.

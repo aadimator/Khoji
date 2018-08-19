@@ -8,13 +8,16 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.aadimator.khoji.R;
 import com.aadimator.khoji.common.GlideApp;
 import com.aadimator.khoji.common.Utilities;
+import com.google.ar.sceneform.HitTestResult;
 import com.google.ar.sceneform.Node;
 import com.google.ar.sceneform.rendering.ViewRenderable;
 
@@ -66,7 +69,7 @@ public class UserMarker implements Parcelable {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    public void render(Context c, LocationScene locationScene) {
+    public void render(Context c, LocationScene locationScene, OnMarkerTouchListener mListener) {
 
         CompletableFuture<ViewRenderable> couponLayout =
                 ViewRenderable.builder()
@@ -88,6 +91,11 @@ public class UserMarker implements Parcelable {
                                 ViewRenderable vr = couponLayout.get();
                                 Node base = new Node();
                                 base.setRenderable(vr);
+
+                                base.setOnTapListener((hitTestResult, motionEvent) -> {
+                                    Toast.makeText(c, mUser.getName(), Toast.LENGTH_SHORT).show();
+                                    mListener.onMarkerTouched(this);
+                                });
 
                                 TextView title = vr.getView().findViewById(R.id.nodeName);
                                 title.setText(mUser.getName());
@@ -113,6 +121,7 @@ public class UserMarker implements Parcelable {
                                         mUserLocation.getLatitude(),
                                         base
                                 );
+
 
                                 couponLocationMarker.setRenderEvent(new LocationNodeRender() {
                                     @Override
@@ -185,6 +194,10 @@ public class UserMarker implements Parcelable {
 
     public void setInRange(boolean inRange) {
         mInRange = inRange;
+    }
+
+    public interface OnMarkerTouchListener {
+        void onMarkerTouched(UserMarker marker);
     }
 
     @Override
