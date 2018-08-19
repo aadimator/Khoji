@@ -93,8 +93,8 @@ public class UserMarker implements Parcelable {
                                 title.setText(mUser.getName());
 
                                 ImageView imageView = vr.getView().findViewById(R.id.nodeImage);
-//                                imageView.setColorFilter(null);
 
+                                // To tint the placeholder
                                 Drawable placeholder = Utilities.getTinted
                                         (
                                                 c,
