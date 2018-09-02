@@ -6,9 +6,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -35,19 +33,16 @@ import com.aadimator.khoji.common.Utilities;
 import com.aadimator.khoji.models.User;
 import com.aadimator.khoji.models.UserLocation;
 import com.aadimator.khoji.models.UserMarker;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.ar.core.ArCoreApk;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -61,7 +56,6 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -71,16 +65,16 @@ import butterknife.OnClick;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link MapFragment.OnFragmentInteractionListener} interface
+ * {@link SupportMapFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link MapFragment#newInstance} factory method to
+ * Use the {@link SupportMapFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MapFragment extends Fragment implements
+public class SupportMapFragment extends Fragment implements
         OnMapReadyCallback {
 
     private static final String ARG_UID = "uid";
-    private final String TAG = MapFragment.class.getSimpleName();
+    private final String TAG = SupportMapFragment.class.getSimpleName();
 
     @BindView(R.id.locateInARButton)
     FloatingActionButton mArButton;
@@ -184,10 +178,10 @@ public class MapFragment extends Fragment implements
      * user's location provided in the args.
      *
      * @param cameraFocusUid User ID where the Camera will be focused.
-     * @return A new instance of fragment MapFragment.
+     * @return A new instance of fragment SupportMapFragment.
      */
-    public static MapFragment newInstance(String cameraFocusUid) {
-        MapFragment mapFragment = new MapFragment();
+    public static SupportMapFragment newInstance(String cameraFocusUid) {
+        SupportMapFragment mapFragment = new SupportMapFragment();
         Bundle args = new Bundle();
         args.putString(ARG_UID, cameraFocusUid);
         mapFragment.setArguments(args);
@@ -261,13 +255,7 @@ public class MapFragment extends Fragment implements
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(mActivity);
 
-        // Get current user's location using last known location
-        getCurrentLocation();
 
-        startListeningForCurrentUserLocationUpdates();
-
-        // Get the location and info of the User's contacts
-        getContactsInfo();
     }
 
     @Override
@@ -317,13 +305,28 @@ public class MapFragment extends Fragment implements
         super.onViewCreated(view, savedInstanceState);
 
         // Register for the Map callback
-        SupportMapFragment supportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.mapFragment);
+        com.google.android.gms.maps.SupportMapFragment supportMapFragment = (com.google.android.gms.maps.SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.mapFragment);
         supportMapFragment.getMapAsync(this);
     }
 
     @Override
     public void onStart() {
         super.onStart();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        Log.d(TAG, "OnResume()");
+        // Get current user's location using last known location
+        getCurrentLocation();
+
+//        updateMap();
+        startListeningForCurrentUserLocationUpdates();
+
+        // Get the location and info of the User's contacts
+        getContactsInfo();
     }
 
     @Override
@@ -444,6 +447,8 @@ public class MapFragment extends Fragment implements
      * That's why writing this in a separate function.
      */
     private void updateCurrentUserMarker() {
+        if (mCurrentLocation == null) return;
+
         LatLng latLng = new LatLng(
                 mCurrentLocation.getLatitude(),
                 mCurrentLocation.getLongitude()
@@ -539,6 +544,8 @@ public class MapFragment extends Fragment implements
                             locations.child(mCurrentUser.getUid()).setValue(new UserLocation(location));
 
                             updateMap();
+                        } else {
+                            startListeningForCurrentUserLocationUpdates();
                         }
                     });
         }
@@ -557,6 +564,10 @@ public class MapFragment extends Fragment implements
                                 if (mCurrentLocation != null && location.getTime() > mCurrentLocation.getTime()) {
                                     mCurrentLocation = location;
                                     updateMap();
+                                }
+
+                                if (mCurrentLocation == null) {
+                                    mCurrentLocation = location;
                                 }
                             }
 

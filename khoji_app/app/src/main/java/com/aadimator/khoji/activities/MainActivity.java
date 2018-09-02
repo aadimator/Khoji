@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -25,7 +24,7 @@ import com.aadimator.khoji.BuildConfig;
 import com.aadimator.khoji.R;
 import com.aadimator.khoji.fragments.AccountFragment;
 import com.aadimator.khoji.fragments.ContactsFragment;
-import com.aadimator.khoji.fragments.MapFragment;
+import com.aadimator.khoji.fragments.SupportMapFragment;
 import com.aadimator.khoji.services.LocationJobService;
 import com.aadimator.khoji.common.Constant;
 import com.firebase.jobdispatcher.Constraint;
@@ -37,19 +36,16 @@ import com.firebase.jobdispatcher.RetryStrategy;
 import com.firebase.jobdispatcher.Trigger;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity implements
-        MapFragment.OnFragmentInteractionListener,
+        SupportMapFragment.OnFragmentInteractionListener,
         ContactsFragment.OnFragmentInteractionListener {
 
     private final String TAG = MainActivity.class.getSimpleName();
@@ -103,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements
             mSelectedFragment = getSupportFragmentManager().getFragment(savedInstanceState,
                     FRAGMENT_SAVE_KEY);
         } else {
-            mSelectedFragment = MapFragment.newInstance(UID);
+            mSelectedFragment = SupportMapFragment.newInstance(UID);
         }
 
         changeFragment();
@@ -121,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_map:
-                    mSelectedFragment = MapFragment.newInstance(FirebaseAuth.getInstance().getUid());
+                    mSelectedFragment = SupportMapFragment.newInstance(FirebaseAuth.getInstance().getUid());
                     break;
                 case R.id.navigation_contacts:
                     mSelectedFragment = ContactsFragment.newInstance();
@@ -156,19 +152,17 @@ public class MainActivity extends AppCompatActivity implements
     private void startLocationService() {
         // Begin by checking if the device has the necessary location settings.
         mSettingsClient.checkLocationSettings(mLocationSettingsRequest)
-                .addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
-                    @SuppressLint("MissingPermission")
-                    @Override
-                    public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
-                        Log.i(TAG, "All location settings are satisfied.");
+                .addOnSuccessListener(this, locationSettingsResponse -> {
+                    Log.i(TAG, "All location settings are satisfied.");
 
-                        FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(MainActivity.this));
-                        Bundle bundle = new Bundle();
-                        bundle.putLong(UPDATE_INTERVAL, UPDATE_INTERVAL_IN_MILLISECONDS);
+                    changeFragment();
 
-                        Job myJob = createJob(dispatcher, bundle);
-                        dispatcher.mustSchedule(myJob);
-                    }
+                    FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(MainActivity.this));
+                    Bundle bundle = new Bundle();
+                    bundle.putLong(UPDATE_INTERVAL, UPDATE_INTERVAL_IN_MILLISECONDS);
+
+                    Job myJob = createJob(dispatcher, bundle);
+                    dispatcher.mustSchedule(myJob);
                 })
                 .addOnFailureListener(this, new OnFailureListener() {
                     @Override
@@ -358,7 +352,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onContactSelection(String uid) {
-        mSelectedFragment = MapFragment.newInstance(uid);
+        mSelectedFragment = SupportMapFragment.newInstance(uid);
         changeFragment();
 //        startActivity(ChatActivity.newIntent(this, uid));
     }
