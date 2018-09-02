@@ -1,0 +1,247 @@
+% Encoding: windows-1252
+
+@Article{silva2003introduction,
+  author    = {Silva, R and Oliveira, Jauvane C and Giraldi, Gilson A},
+  title     = {Introduction to augmented reality},
+  journal   = {National laboratory for scientific computation, Av. Getulio Vargas},
+  year      = {2003},
+  publisher = {Citeseer},
+}
+
+@Online{Hachach-Haram2017,
+  author = {Nadine Hachach-Haram},
+  editor = {TED},
+  title  = {How Augmented Reality could change the future of surgery},
+  year   = {2017},
+  date   = {2017-11-13},
+  url    = {https://www.ted.com/talks/nadine_hachach_haram_how_augmented_reality_could_change_the_future_of_surgery},
+}
+
+@Article{azuma1997survey,
+  author    = {Azuma, Ronald T},
+  title     = {A survey of augmented reality},
+  journal   = {Presence: Teleoperators \& Virtual Environments},
+  year      = {1997},
+  volume    = {6},
+  number    = {4},
+  pages     = {355--385},
+  publisher = {MIT Press},
+}
+
+@Online{Maps2018,
+  author = {Google Maps},
+  title  = {Google Maps AR},
+  year   = {2018},
+  date   = {2018-05-08},
+  url    = {https://youtu.be/ogfYd705cRs?t=1h26m6s},
+}
+
+@Online{MapboxAR2017,
+  author = {MapboxAR},
+  title  = {Creating a World Scale AR Experience Using Geospatial Data},
+  year   = {2017},
+  date   = {2017-10-31},
+  url    = {https://youtu.be/vRmTn25xm7Q?t=12m8s},
+}
+
+@Online{FirebaseWikipedia2018,
+  author = {Wikipedia contributors},
+  editor = {Wikipedia, The Free Encyclopedia.},
+  title  = {Firebase Wikipedia},
+  year   = {2018},
+  date   = {2018-07-27},
+  url    = {https://en.wikipedia.org/w/index.php?title=Firebase&oldid=852183550},
+}
+
+@Online{Firebase2018,
+  author = {Firebase},
+  editor = {Firebase},
+  title  = {Firebase Services},
+  year   = {2018},
+  date   = {2018-07-28},
+  url    = {https://firebase.google.com/products/},
+}
+
+@Online{FirebasePricing2018,
+  author = {Firebase Developers},
+  editor = {Firebase},
+  title  = {Firebase Pricing},
+  year   = {2018},
+  date   = {2018-07-28},
+  url    = {https://firebase.google.com/pricing/},
+}
+
+@Online{Moon2018,
+  author = {Danny Moon},
+  editor = {VentureBeat},
+  title  = {Mobile AR is evolving faster than you think},
+  year   = {2018},
+  date   = {2018-05-19},
+  url    = {https://venturebeat.com/2018/05/19/mobile-ar-is-evolving-faster-than-you-think/},
+}
+
+@Online{ARKitDevelopers2018,
+  author = {Apple},
+  editor = {Apple},
+  title  = {ARKit Developers},
+  year   = {2018},
+  date   = {2018-07-28},
+  url    = {https://developer.apple.com/arkit/},
+}
+
+@Online{ARCoreDevelopers2018,
+  author = {ARCore},
+  editor = {Google},
+  title  = {ARCore Developers},
+  year   = {2018},
+  date   = {2018-07-28},
+  url    = {https://developers.google.com/ar/discover/},
+}
+
+@Online{ARCoreSupportedDevices2018,
+  author = {ARCore Developers},
+  editor = {Google},
+  title  = {ARCore Supported Devices},
+  year   = {2018},
+  date   = {2018-06-29},
+  url    = {https://developers.google.com/ar/discover/supported-devices},
+}
+
+@Online{MVP2018,
+  author = {Wikipedia contributors},
+  editor = {Wikipedia, The Free Encyclopedia.},
+  title  = {Model_view_presenter},
+  year   = {2018},
+  date   = {2018-07-28},
+  url    = {https://en.wikipedia.org/w/index.php?title=Model%E2%80%93view%E2%80%93presenter&oldid=849618475},
+}
+
+@Online{FirebaseUI2018,
+  author = {FirebaseUI},
+  editor = {Github},
+  title  = {Firebase UI Android},
+  year   = {2018},
+  date   = {2018-07-28},
+  url    = {https://github.com/firebase/FirebaseUI-Android},
+}
+
+@Online{NoSQLWiki2018,
+  author = {Wikipedia contributors},
+  editor = {Wikipedia, The Free Encyclopedia.},
+  title  = {NoSQL},
+  year   = {2018},
+  date   = {2018-07-28},
+  url    = {https://en.wikipedia.org/w/index.php?title=NoSQL&oldid=851300456},
+}
+
+@Online{FirebaseUsageLimits2018,
+  author = {Firebase},
+  editor = {Firebase},
+  title  = {Firebase Database Usage Limits},
+  year   = {2018},
+  date   = {2018-07-28},
+  url    = {https://firebase.google.com/docs/database/usage/limits},
+}
+
+@Online{GoogleLocationLimits2018,
+  author = {Google},
+  editor = {Google},
+  title  = {Background Location Limits},
+  year   = {2018},
+  date   = {2018-07-29},
+  url    = {https://developer.android.com/about/versions/oreo/background-location-limits},
+}
+
+@Online{AndroidPermissions2018,
+  author = {Android},
+  editor = {Google},
+  title  = {Android Permissions overview},
+  year   = {2018},
+  date   = {2018-07-29},
+  url    = {https://developer.android.com/guide/topics/permissions/overview},
+}
+
+@Online{AndroidFragments2018,
+  author = {Google},
+  editor = {Google},
+  title  = {Fragments Developer Documentation},
+  year   = {2018},
+  date   = {2018-07-29},
+  url    = {https://developer.android.com/guide/components/fragments},
+}
+
+@Online{MapboxUnitySDK2018,
+  author = {Mapbox},
+  editor = {Github},
+  title  = {Mapbox Unity SDK},
+  year   = {2018},
+  date   = {2018-07-29},
+  url    = {https://github.com/mapbox/mapbox-unity-sdk/},
+}
+
+@Online{ARCoreLocation2018,
+  author = {appoly},
+  editor = {Github},
+  title  = {ARCore Location},
+  year   = {2018},
+  date   = {2018-07-29},
+  url    = {https://github.com/appoly/ARCore-Location},
+}
+
+@Online{ARCoreSceneForm2018,
+  author = {ARCore},
+  editor = {Google},
+  title  = {ARCore SceneForm},
+  year   = {2018},
+  date   = {2018-07-29},
+  url    = {https://developers.google.com/ar/develop/java/sceneform/},
+}
+
+@Online{GoogleVPS2018,
+  author = {Google Developers},
+  editor = {Youtube},
+  title  = {Google VPS},
+  year   = {2018},
+  date   = {2018-05-08},
+  url    = {https://youtu.be/ogfYd705cRs?t=1h27m1s},
+}
+
+@Book{schmalstieg2016augmented,
+  author    = {Schmalstieg, D. and Hollerer, T.},
+  title     = {Augmented Reality: Principles and Practice},
+  year      = {2016},
+  series    = {Usability},
+  publisher = {Pearson Education},
+  isbn      = {9780133153200},
+  url       = {https://books.google.com.pk/books?id=qPU2DAAAQBAJ},
+}
+
+@Book{craig2013understanding,
+  author    = {Craig, A.B.},
+  title     = {Understanding Augmented Reality: Concepts and Applications},
+  year      = {2013},
+  publisher = {Elsevier Science},
+  isbn      = {9780240824109},
+  url       = {https://books.google.com.pk/books?id=7\_O5LaIC0SwC},
+  lccn      = {2013013517},
+}
+
+@Online{DialogFlow2018,
+  author = {DialogFlow},
+  editor = {DialogFlow},
+  title  = {DialogFlow Site},
+  year   = {2018},
+  date   = {2018-08-12},
+  url    = {https://dialogflow.com/},
+}
+
+@Online{DialogFlowPricing2018,
+  author = {Dialog Flow},
+  editor = {DialogFlow},
+  title  = {DialogFlow Pricing},
+  year   = {2018},
+  date   = {2018-08-12},
+  url    = {https://dialogflow.com/pricing},
+}
+
+@Comment{jabref-meta: databaseType:biblatex;}

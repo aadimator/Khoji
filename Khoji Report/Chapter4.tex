@@ -1,0 +1,46 @@
+\chapter{Evaluation of Objectives} 
+\label{chap4}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+In this chapter, we will talk about the end result of all the effort that was put into this project and whether it was worth it or not at the end. We will evaluate as to what extent our implementation of the software solves the problem that it was intended to solve. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\section{Augmented Reality}
+
+The core objectives set for this project, as defined in the section \ref{objectives}, were:
+\begin{itemize}
+    \item Design and implement a system that tracks a user location and stores it in a remote database in real-time.
+    \item Implement some social features so that a user can add other users into his contact list and keep track of their location at all times.
+    \item Add real-time chatting functionality in the application for easier communication between users when navigating.
+    \item Use Augmented Reality for the visualisation of the user marker in the real-world at any specific interval.
+    \item Add in-app chat-bot that provides guidance and assistance to the user in using the app effectively.
+    \item The devised system should be economical, for the end-user as well as for the developers.
+\end{itemize}
+
+We now analyse the extent that to which this project was successful in achieving these objectives.
+
+\section{Location Tracking}
+The first objective was to track each user and update his location details in a remote database in real-time. We have successfully implemented this feature in our application. As soon as the user logs in to the app, he is prompted to turn on his location services if they are disabled, and his location updates are immediately updated in the Firebase Database. If there is no network connection at that time, the location updates are stored locally, and they are updated to the database as soon as the device is back online.
+
+\section{Contacts}
+We have successfully completed this objective as well. The user can add other users as his contacts and is able to listen to the location updates of his contacts. We visualise the location of contacts using markers on a map. As soon as the location of the contact is updated in the database, the newly updated record is fetched from the database, and the marker of the contact shown on the map is also updated to reflect that change in real-time.
+
+\section{Real-time Chat}
+This objective has also been completed successfully. Two users can initiate a conversation with one another whenever they want. They will be able to message one another in real-time. If there is no network availability at the moment, we have enabled offline persistence in our app as well, so this will store the messages locally, and as soon as the device is back online, it will push the updates to the database.
+
+
+\section{Augmented Reality}
+We have also completed this objective partially. The user markers are shown in the AR scene at their specified GPS coordinates. The markers are stable, i.e. they do not float around in the AR scene as they used to before. Their position also gets accurate the longer they open that activity. By moving around after opening the AR scene, it updates its sense of the surrounding environment and adjusts its position accordingly.
+
+\section{Chat Bot Integration}
+We have successfully integrated a chatbot into our application using the REST API services offered by the DialogFlow platform. Users can query the bot by sending him messages through the app, and the bot will respond accordingly to their queries and try to help out the users in accomplishing their desired tasks.
+
+\section{Economic}
+Our devised solution is economical for both, end-users as well as the developers. For end-users, it is completely free. They do not have to pay a single dime in order to use the app. For the developers, it is also completely free, but there are some limitations to that, as discusses earlier. Under a certain usage limit, it is completely free, but after the app usage crosses that limit and uses additional resources, a small fee is charged. For the normal use case, the app will not go over the usage limits. So, unless the app becomes a nationwide phenomenon, it will remain free for the developers as well.
+
+
+\section{Summary}
+We have completed all the objectives that were stated at the start of the project. There is still space for some improvement, especially in the implementation of Augmented Reality feature, but with the passage of time, as the library matures and devices get powerful enough, the stability and the features will be improved as well.
+
+

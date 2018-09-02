@@ -1,0 +1,40 @@
+\chapter{Conclusion and Future Work} 
+\label{chap5}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In this chapter, we will provide the conclusion of our project along with some future enhancements and features that could be added to further improve the effectiveness, stability and robustness of the application.
+
+\section{Conclusion}
+In this project, our goal was to design an economic software system that could be used to track the location of a user and then use augmented reality to visualize his location in AR scene by using markers. We used Google Firebase as the back-end for our application which acts as an Authentication provider as well as a remote database. The location details of the user are extracted from his device and stored in the database in real-time. They are then fetched from the database and shown to the user's contacts, either in Google Maps or AR scene view if the device of the end-user supports it.
+
+We also implemented a social system such that the users could add one another as their contacts. The user could be able to track the location of their contacts at any point in time. The position of the user is then visualized using markers on both, Google Maps as well as in AR scene where the AR marker is placed at the GPS coordinates of the user. 
+
+We also implemented real-time chat in this application so users could easily communicate with one another during the navigation without having to leave the app. We also integrated a chatbot into our app so users could ask him their queries and have a rewarding and enjoyable experience. We also managed to design this whole system in such a way that it is not a financial burden, for both the end-users as well as the developers.
+
+
+\section{Future Work}
+Certain elements in this project leave scope for further development. With almost any project that includes a software component, a list of future enhancements could be endless. In this chapter, we will highlight the general areas where extra work would benefit the system by increasing its usability, reliability, and effectiveness.
+
+\subsection{AR Stability Improvements}
+Although the stability of the markers shown in the AR scene has improved tenfold, there is always the need for further improvement. With the passage of time, as the library improves, the stability of the markers will also improve along the way. So, the software should be updated to use the latest ARCore version as soon as it is released.
+
+\subsection{VPS}
+GPS is not a very reliable source of information, especially in urban areas. Its result is usually off by a couple of meters, and sometimes more, which is not a big deal most of the time, but when it comes to visualizing the location of an object in AR, it matters a lot if the marker shows its position to be other than where it is. This low accuracy affects the user experience a lot. Google is developing a new kind of technology, Visual Positioning System (VPS) \cite{GoogleVPS2018}, that uses the live video feed along with GPS to better understand where you are in the world. This technology could also be used for indoor navigation as well. By using this technology, the effectiveness, reliability, and stability of our application will be increased greatly, as we will be able to locate users inside buildings, on different floors, with better location awareness and stability of the markers.
+
+\subsection{User Groups}
+For now, in our application, a user can not group his contacts, meaning one group for family, another for friends, another for Naaraan Tour, etc. By introducing grouping functionality into this app, it will be a lot easier for the users to keep track of a huge number of users easily. They could, at one time, only decide to show the markers for a particular group, to see what they are up to and where without cluttering their space with those that are not required at the moment. 
+
+
+Once the grouping functionality is implemented, it will be easier to implement group chat messaging as well. They would be able to create chat groups for specific people in their contact list just like they can do in apps like WhatsApp and Messenger. For example, if they are going on a hiking trip and they create a group with all the participants of the trip, they would only choose to show the markers for that particular group for the time being, and they could also message one another for secure communication.
+
+\subsection{Guide in AR}
+To increase the user experience, a playful guide could also be added into the app. Once the user opens the AR activity, the guide would pop up in the AR scene, most probably in the form of an animal or bird or some other character, and it would guide him to his location, or it could just roam in the AR scene mindlessly. It could also respond to various queries from the user and try to company them as they navigate to their contacts.
+
+
+\subsection{Altitude Usage}
+We were planning to use the altitude of the user in our app as well. This will greatly increase the effectiveness of the app as the users will be able to see where a particular user is in the building and on which floor. This is a type of functionality that traditional 2D based systems cannot convey effectively and is better suited for an AR app. For now, the library does not support this functionality, but there is work being done on it so there is a strong chance that it might be available as a feature in the near future.
+
+
+\subsection{Summary}
+These were some of the things that came to our mind during the development of this project. We were planning to implement a few of them, but because of some unforeseen problems and the shortage of time, we were not able to do so. We are hoping that in the future, we, or someone else will take up the mantle and implement some of these features into this app which will make the usability and effectiveness of the app improve tenfold.
+

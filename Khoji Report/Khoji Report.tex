@@ -1,0 +1,415 @@
+%%%%%Copyrights, Mudassar Ali Khan, Department of Information Technology, Haripur%%%%%
+
+\documentclass[12pt]{report}
+\usepackage{multirow} 
+\usepackage[dvips]{graphicx}
+\usepackage{amsmath}
+\usepackage{setspace}
+%\usepackage{fixltx2e}
+\usepackage[top=1in, bottom=1in, left=1.5in, right=1in]{geometry}
+\usepackage[USenglish]{babel}
+\usepackage{url}
+\usepackage{enumerate}
+\usepackage{subfig}
+\usepackage{color}
+\usepackage{pdfpages}
+\usepackage[table]{xcolor}
+\usepackage{graphicx}
+%\usepackage{subcaption}
+%sad
+\usepackage{pdfpages}
+
+
+%\usepackage{titlesec}
+\usepackage[pagestyles]{titlesec}
+
+%\includepdf[pages=-]{Abbreviation}
+\titleformat{\chapter}[display]
+  {\normalfont\huge\raggedleft}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
+\titlespacing{\chapter}
+  {0pt}{30pt}{50pt}
+
+
+	
+%\doublespacing
+\linespread{2} 
+
+
+\usepackage{hyperref}
+\hypersetup{
+    unicode=false,          % non-Latin characters in Acrobat's bookmarks
+    pdftoolbar=true,        % show Acrobat's toolbar?
+    pdfmenubar=true,        % show Acrobat's menu?
+    pdffitwindow=true,     % window fit to page when opened
+    pdfstartview={FitH},    % fits the width of the page to the window
+    pdftitle={Title of Thesis},    % title//////////////////////
+    pdfauthor={Student Name},     % author////////////////////////////////////
+    pdfsubject={BSCSThesis},   % subject of the document/////////////////////////
+    pdfcreator={Creator},   % creator of the document
+    pdfproducer={Producer}, % producer of the document
+    pdfkeywords={Keyword1} {Keyword2} {Keyword3} {keyword4}, % list of keywords////////////////////////////////////
+    pdfnewwindow=true,      % links in new window
+    colorlinks=true,       % false: boxed links; true: colored links
+    linkcolor=black,          % color of internal links
+    citecolor=black,        % color of links to bibliography
+    filecolor=black,      % color of file links
+    urlcolor=black            %cyan color of external links
+    }
+\usepackage{cite}
+\def\itemizeSKIP{\vspace{-12pt}}
+% 
+% using package for vertical images
+%
+
+%//////////////////////////////////////
+\usepackage{subfig}
+\usepackage{times}
+%\usepackage[pagestyles]{titlesec}
+\newpagestyle{main}{\setfoot{}{}{\thepage}}
+\pagestyle{main}
+\assignpagestyle{\chapter}{main} 
+%////////////////////////////////////////////////////////////////////
+\usepackage{enumitem}
+
+\usepackage{float}
+
+%\usepackage[backend=bibtex,style=ieee,dashed=false]{biblatex}
+
+%/////////////////////////////////////////////////////////
+\addto\captionsUSenglish{\renewcommand*\contentsname{Table of Contents}}
+
+\setcounter{secnumdepth}{3}
+
+
+%///////////////////////////////////////////////////
+\begin{document}
+%///////////////////////////////////////////////////////////
+\singlespacing  
+\begin{titlepage}
+\begin{center}
+{
+	\Huge
+	\center{Real-time Location Tracking and Visualization using Augmented Reality}\\
+}
+
+\vspace{3cm}
+\begin{figure}[!h]
+	\centering
+		\includegraphics[scale=0.16]{images/logo.png}
+		\label{fig:Logo1}
+\end{figure}
+
+\vspace{15mm}
+
+{
+\Large
+				
+			By\\[0.2\baselineskip]
+				\vspace{4mm}
+			{Aadam \\ Hamza Saeed}
+\\
+\vspace{10mm}
+{
+
+		\LARGE
+				\center{Department of Information Technology}\\
+				\center{University of Haripur}\\				
+				\center{Haripur, Pakistan}\\			
+					\vspace{0.2cm}		
+				\center{September, 2018}
+}
+}
+
+\end{center}
+\end{titlepage}
+%\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+%\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\begin{titlepage}
+\begin{center}
+
+{
+	\Huge
+	\center{Real-time Location Tracking and Visualization using Augmented Reality}\\
+}
+
+\vspace{3cm}
+\begin{figure}[!h]
+	\centering
+		\includegraphics[scale=0.16]{images/logo.png}
+		\label{fig:logo2}
+		
+\end{figure}
+
+\vspace{7mm}
+
+{
+\Large
+			By\\[0.2\baselineskip]
+				\vspace{4mm}
+			{  \hspace{15mm} Aadam, Hamza Saeed}\\{6396, 6391}
+\\
+\vspace{10mm}
+\center{Supervised by}\\
+	\vspace{3mm}
+Mudassar Ali Khan\\
+}
+\vspace{11mm}
+
+{
+		\LARGE
+				\center{Department of Information Technology}\\
+				\center{University of Haripur}\\		
+				\center{Haripur, Pakistan}\\		
+					\vspace{0.2cm}	
+				\center{September, 2018}
+}
+
+\end{center}
+\end{titlepage}
+
+%\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+%\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+
+
+\begin{titlepage}
+\begin{center}
+
+
+{
+	\Huge
+		\center{Real-time Location Tracking and Visualization using Augmented Reality}\\
+}
+
+
+\vspace{3cm}
+\begin{figure}[!h]
+	\centering
+		\includegraphics[scale=0.16]{images/logo.png}
+		\label{fig:logo3}
+\end{figure}
+
+%\vspace{0.05cm}
+\vspace{0.05cm}
+{
+\Large
+			By\\[0.2\baselineskip]
+				\vspace{2mm}
+%			\textsc
+			{Aadam, Hamza Saeed}\\[1.5cm]
+}
+{
+		\large
+			\text{A Dissertation Submitted in Partial Fulfillment for the}\\
+			\text{Degree of}\\
+	\vspace{0.2cm}
+			{BACHELORS OF SCIENCE}\\			
+			\vspace{0.2cm}	
+			IN\\
+			COMPUTER SCIENCE\\
+			
+		
+}
+%\vspace{0.1cm}
+\vspace{0.2cm}
+{
+		\LARGE
+			\center{ Department of Information Technology}\\
+			\center{ University of Haripur}\\
+			\center{Haripur, Pakistan}\\	
+				\vspace{0.1cm}			
+			\center{September, 2018}
+}
+
+\end{center}
+
+\end{titlepage}
+
+%\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+%\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+\begin{titlepage}
+\begin{center}
+
+
+{
+	\Huge
+		\center{Real-time Location Tracking and Visualization using Augmented Reality}\\
+}
+
+
+\vspace{0.5cm}
+
+%\vspace{0.05cm}
+\vspace{0.05cm}
+{
+\Large
+			By\\[0.2\baselineskip]
+				\vspace{2mm}
+%			\textsc
+			{Aadam, Hamza Saeed}\\[2.2cm]
+}
+{
+\huge
+CERTIFICATE
+}
+\vspace{0.8cm}
+{
+		
+			A THESIS SUBMITTED IN THE PARTIAL FULFILMENT OF THE \\
+			REQUIRMENTS FOR THE DEGREE OF BACHELORS\\
+			IN COMPUTER SCIENCE\\
+\vspace{0.3cm}
+			\text{We accept this dissertation as conforming to the required standards}\\
+	\vspace{0.3cm}
+			}
+			
+{
+\begin{table}[h]
+% Table generated by Excel2LaTeX from sheet 'Sheet1'
+\centering
+\begin{tabular}{m{5cm}m{2cm}m{5.5cm}}
+&            &            \\ \cline{1-1}\cline{3-3} 
+
+\text{Mudassar Ali Khan} &            &\text{Dr. Yousaf Saeed}\\[1ex]
+
+Project Supervisor &            &Final Year Projects Coordinator\\[1ex]
+
+\end{tabular}  
+\end{table}
+ }
+
+{
+\begin{table}[h]
+% Table generated by Excel2LaTeX from sheet 'Sheet1'
+\centering
+\begin{tabular}{m{5cm}m{2cm}m{5cm}}
+&            &            \\ \cline{1-1}\cline{3-3} 
+
+External &            &\text{Mr. Muhammad Junaid}\\[1ex]
+Examiner &            &Head of Department\\[1ex]
+
+\end{tabular}  
+\end{table}
+ }
+		%{
+%\begin{table}[h]
+%% Table generated by Excel2LaTeX from sheet 'Sheet1'
+%\centering
+%\begin{tabular}{m{2cm}m{6cm}m{2cm}}
+%&            &            \\ \cline{2-2}
+%& . \newline (External Examiner)&\\
+%&&\\
+%&Dated: \underline{\hspace{3cm},2016}&\\
+%
+%& & \\[2ex]
+%
+%\end{tabular}  
+%\end{table}
+ %}
+
+%\vspace{0.1cm}
+\vspace{0.8cm}
+{
+		\LARGE
+			\center{ Department of Information Technology}\\
+			\center{ University of Haripur}\\
+			\center{Haripur, Pakistan}\\	
+				\vspace{0.2cm}			
+			\center{September, 2018}
+}
+
+\end{center}
+
+\end{titlepage}
+%\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+%\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+%\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+%\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+%\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+%\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\doublespacing  
+
+\input{front}
+\pagenumbering{roman}
+
+\chapter*{Declaration} 
+\declaration
+\addcontentsline{toc}{chapter}{Declaration}
+\clearpage
+
+%\newpage
+%\vspace*{2in}
+%\begin{center}{\dedication}\end{center}
+\chapter*{}
+\begin{center}
+ %\thispagestyle {empty}
+\Large Dedicated to \\
+
+\center{\text{\textit{our most respectful and beloved parents.}}}\\
+\addcontentsline{toc}{chapter}{Dedication}
+\end{center}
+
+%\thispagestyle {empty}
+\clearpage
+
+\chapter*{Acknowledgment} 
+\acknowledgementtext
+\addcontentsline{toc}{chapter}{Acknowledgment}
+
+\clearpage
+
+\chapter*{Abstract}
+\abstracttext
+\addcontentsline{toc}{chapter}{Abstract}
+
+\clearpage
+
+
+\tableofcontents
+%\addcontentsline{toc}{chapter}{Table of Contents} 
+\clearpage
+
+\listoffigures
+\addcontentsline{toc}{chapter}{List of Figures}
+\clearpage
+%
+%
+%\listoftables 
+%\addcontentsline{toc}{chapter}{List of Tables}
+%\clearpage
+
+
+
+
+
+\pagenumbering{arabic}
+\input{Chapter1.tex}
+\input{Chapter2.tex}
+\input{Chapter3.tex}
+\input{Chapter4.tex}
+\input{Chapter5.tex}
+%\input{Chapter7.tex}
+%\input{Chapter6.tex}
+%\input{Chapter8.tex}
+
+
+\renewcommand\bibname{References}
+\bibliographystyle{IEEETRAN}
+\bibliography{referencesN}
+
+
+%\usepackage[backend=bibtex,style=verbose-trad2]{biblatex}
+%\printbibliography
+
+\addcontentsline{toc}{chapter}{References}
+
+%\addcontentsline{toc}{chapter}{Appendix}
+%\appendix
+%\input{Appendix.tex}
+%\includepdf[pages={1-7}]{Questionnaire.pdf}
+
+
+\end{document}
