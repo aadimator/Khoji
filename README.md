@@ -4,9 +4,13 @@ An android app, that tracks the location of a user and updates it in the Firebas
 
 We use Augmented Reality, using ARCore, to visualize the location markers of the users so it is easier for them to locate their contacts.
 
-=========
+We have also included Real-time chat, as well as integrated a chat-bot into the application.
 
-You can find the complete report here: [Khoji Report/Khoji Report.pdf](./Khoji%20Report/Khoji%20Report.pdf)
+![Khoji](./screenshots/Khoji_screen.png)
+
+---
+
+To better understand the project and to see all the features, you can take a look the project report. You can find the complete report here: [Khoji Report/Khoji Report.pdf](./Khoji%20Report/Khoji%20Report.pdf)
 There is also a presentation that will highlight the main features of the app and provide some demos as well. You can find it here: [presentation/FYP.pptx](./presentation/FYP.pptx)
 
 ## Installation Instructions
@@ -40,4 +44,5 @@ KEY_PASSWORD=your_psswd
 - ARCore
 - ARCore Location
 
+background-image: linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%);
 
