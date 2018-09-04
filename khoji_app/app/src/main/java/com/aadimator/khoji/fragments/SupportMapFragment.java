@@ -592,8 +592,10 @@ public class SupportMapFragment extends Fragment implements
                             new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
-                                    User user = dataSnapshot.getValue(User.class);
-                                    mContacts.put(dataSnapshot.getKey(), user);
+                                    if (!dataSnapshot.getKey().equals(Constant.BOT_UID)) {
+                                        User user = dataSnapshot.getValue(User.class);
+                                        mContacts.put(dataSnapshot.getKey(), user);
+                                    }
                                 }
 
                                 @Override
@@ -619,9 +621,11 @@ public class SupportMapFragment extends Fragment implements
                             new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
-                                    UserLocation location = dataSnapshot.getValue(UserLocation.class);
-                                    mContactsLocations.put(dataSnapshot.getKey(), location);
-                                    updateMap();
+                                    if (!dataSnapshot.getKey().equals(Constant.BOT_UID)) {
+                                        UserLocation location = dataSnapshot.getValue(UserLocation.class);
+                                        mContactsLocations.put(dataSnapshot.getKey(), location);
+                                        updateMap();
+                                    }
                                 }
 
                                 @Override
