@@ -6,7 +6,7 @@ We use Augmented Reality, using ARCore, to visualize the location markers of the
 
 We have also included Real-time chat, as well as integrated a chat-bot into the application.
 
-![Khoji](./screenshots/Khoji_screen.png)
+![Khoji](./screenshots/Khoji_screens.png?raw=true)
 
 ---
 
